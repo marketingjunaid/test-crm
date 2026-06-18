@@ -11,6 +11,7 @@ import { Deals } from './pages/Deals';
 import { Tasks } from './pages/Tasks';
 import { Notes } from './pages/Notes';
 import { Settings } from './pages/Settings';
+import { HR } from './pages/HR';
 
 function ProtectedRoutes() {
   const { user } = useAuth();
@@ -26,6 +27,7 @@ function ProtectedRoutes() {
           <Route path="/deals" element={<Deals />} />
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/notes" element={<Notes />} />
+          <Route path="/hr" element={<HR />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>

@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Users, UserCheck, Building2,
-  TrendingUp, CheckSquare, FileText, Settings, Zap
+  TrendingUp, CheckSquare, FileText, Settings, Zap, UsersRound
 } from 'lucide-react';
 
 const navItems = [
@@ -12,6 +12,7 @@ const navItems = [
   { to: '/deals', icon: TrendingUp, label: 'Deals' },
   { to: '/tasks', icon: CheckSquare, label: 'Tasks' },
   { to: '/notes', icon: FileText, label: 'Notes' },
+  { to: '/hr', icon: UsersRound, label: 'HR' },
   { to: '/settings', icon: Settings, label: 'Settings' },
 ];
 
