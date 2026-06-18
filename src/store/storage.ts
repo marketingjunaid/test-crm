@@ -1,4 +1,4 @@
-import type { AppData, Lead, Contact, Company, Deal, Task, Note } from '../types';
+import type { AppData, Lead, Contact, Company, Deal, Task, Note, HRData, Employee, HiringCandidate, HRDocument, OnboardingTask, OfferLetter, LeaveApplication } from '../types';
 
 const STORAGE_KEY = 'crm_data';
 
@@ -70,3 +70,64 @@ export function getCompanies(): Company[] { return loadData().companies; }
 export function getDeals(): Deal[] { return loadData().deals; }
 export function getTasks(): Task[] { return loadData().tasks; }
 export function getNotes(): Note[] { return loadData().notes; }
+
+// HR Storage
+const HR_STORAGE_KEY = 'crm_hr_data';
+
+const initialHRData: HRData = {
+  employees: [
+    { id: 'e1', name: 'Sarah Mitchell', email: 'sarah@company.com', phone: '555-1001', role: 'Engineering Manager', department: 'Engineering', joinDate: '2022-03-15', status: 'Active', salary: 95000, createdAt: '2022-03-15T09:00:00Z' },
+    { id: 'e2', name: 'James Patel', email: 'james@company.com', phone: '555-1002', role: 'Senior Developer', department: 'Engineering', joinDate: '2022-07-01', status: 'Active', salary: 85000, createdAt: '2022-07-01T09:00:00Z' },
+    { id: 'e3', name: 'Olivia Chen', email: 'olivia@company.com', phone: '555-1003', role: 'Marketing Lead', department: 'Marketing', joinDate: '2023-01-10', status: 'Active', salary: 75000, createdAt: '2023-01-10T09:00:00Z' },
+    { id: 'e4', name: 'Marcus Reed', email: 'marcus@company.com', phone: '555-1004', role: 'Sales Executive', department: 'Sales', joinDate: '2023-05-20', status: 'Active', salary: 70000, createdAt: '2023-05-20T09:00:00Z' },
+    { id: 'e5', name: 'Priya Sharma', email: 'priya@company.com', phone: '555-1005', role: 'HR Specialist', department: 'HR', joinDate: '2024-01-08', status: 'Active', salary: 65000, createdAt: '2024-01-08T09:00:00Z' },
+  ],
+  hiringCandidates: [
+    { id: 'h1', name: 'Tom Walker', email: 'tom@email.com', phone: '555-2001', position: 'Frontend Developer', stage: 'Interview', notes: 'Strong React skills', appliedDate: '2024-01-15', createdAt: '2024-01-15T09:00:00Z' },
+    { id: 'h2', name: 'Nina Lopez', email: 'nina@email.com', phone: '555-2002', position: 'Product Manager', stage: 'Applied', notes: '5 years experience at SaaS companies', appliedDate: '2024-01-20', createdAt: '2024-01-20T09:00:00Z' },
+    { id: 'h3', name: 'Ben Carter', email: 'ben@email.com', phone: '555-2003', position: 'Data Analyst', stage: 'Offer', notes: 'Excellent SQL and Python skills', appliedDate: '2024-01-08', createdAt: '2024-01-08T09:00:00Z' },
+    { id: 'h4', name: 'Amy Zhang', email: 'amy@email.com', phone: '555-2004', position: 'UX Designer', stage: 'Hired', notes: 'Portfolio impressed the team', appliedDate: '2023-12-10', createdAt: '2023-12-10T09:00:00Z' },
+  ],
+  documents: [
+    { id: 'd1', employeeId: 'e1', employeeName: 'Sarah Mitchell', name: 'Employment Contract', type: 'Contract', fileData: '', fileName: 'sarah_contract.pdf', uploadedAt: '2022-03-15T09:00:00Z' },
+    { id: 'd2', employeeId: 'e2', employeeName: 'James Patel', name: 'Offer Letter', type: 'Offer Letter', fileData: '', fileName: 'james_offer.pdf', uploadedAt: '2022-06-25T09:00:00Z' },
+  ],
+  onboardingTasks: [
+    { id: 'o1', employeeId: 'e5', employeeName: 'Priya Sharma', task: 'Setup company email', completed: true, dueDate: '2024-01-09', completedAt: '2024-01-09T10:00:00Z' },
+    { id: 'o2', employeeId: 'e5', employeeName: 'Priya Sharma', task: 'Issue laptop and equipment', completed: true, dueDate: '2024-01-09', completedAt: '2024-01-09T11:00:00Z' },
+    { id: 'o3', employeeId: 'e5', employeeName: 'Priya Sharma', task: 'Sign NDA', completed: false, dueDate: '2024-01-12' },
+    { id: 'o4', employeeId: 'e5', employeeName: 'Priya Sharma', task: 'Complete HR orientation', completed: false, dueDate: '2024-01-15' },
+    { id: 'o5', employeeId: 'e5', employeeName: 'Priya Sharma', task: 'Meet the team', completed: false, dueDate: '2024-01-10' },
+    { id: 'o6', employeeId: 'e4', employeeName: 'Marcus Reed', task: 'Setup company email', completed: true, dueDate: '2023-05-21', completedAt: '2023-05-21T09:00:00Z' },
+    { id: 'o7', employeeId: 'e4', employeeName: 'Marcus Reed', task: 'Sales tool training', completed: true, dueDate: '2023-05-25', completedAt: '2023-05-25T09:00:00Z' },
+    { id: 'o8', employeeId: 'e4', employeeName: 'Marcus Reed', task: 'Sign NDA', completed: true, dueDate: '2023-05-22', completedAt: '2023-05-22T09:00:00Z' },
+  ],
+  offerLetters: [
+    { id: 'ol1', candidateName: 'Ben Carter', position: 'Data Analyst', department: 'Analytics', salary: 72000, startDate: '2024-02-01', createdAt: '2024-01-22T09:00:00Z', status: 'Sent' },
+    { id: 'ol2', candidateName: 'Amy Zhang', position: 'UX Designer', department: 'Design', salary: 78000, startDate: '2024-01-15', createdAt: '2023-12-20T09:00:00Z', status: 'Accepted' },
+  ],
+  leaveApplications: [
+    { id: 'l1', employeeId: 'e1', employeeName: 'Sarah Mitchell', fromDate: '2024-01-22', toDate: '2024-01-24', days: 3, reason: 'Family vacation', status: 'Approved', appliedAt: '2024-01-10T09:00:00Z' },
+    { id: 'l2', employeeId: 'e2', employeeName: 'James Patel', fromDate: '2024-02-05', toDate: '2024-02-07', days: 3, reason: 'Medical appointment', status: 'Pending', appliedAt: '2024-01-18T09:00:00Z' },
+    { id: 'l3', employeeId: 'e3', employeeName: 'Olivia Chen', fromDate: '2024-01-29', toDate: '2024-01-31', days: 3, reason: 'Personal leave', status: 'Approved', appliedAt: '2024-01-15T09:00:00Z' },
+    { id: 'l4', employeeId: 'e4', employeeName: 'Marcus Reed', fromDate: '2024-02-12', toDate: '2024-02-14', days: 3, reason: 'Travel', status: 'Pending', appliedAt: '2024-01-20T09:00:00Z' },
+  ],
+};
+
+export function loadHRData(): HRData {
+  const stored = localStorage.getItem(HR_STORAGE_KEY);
+  if (stored) return JSON.parse(stored) as HRData;
+  localStorage.setItem(HR_STORAGE_KEY, JSON.stringify(initialHRData));
+  return initialHRData;
+}
+
+export function saveHRData(data: HRData): void {
+  localStorage.setItem(HR_STORAGE_KEY, JSON.stringify(data));
+}
+
+export function getEmployees(): Employee[] { return loadHRData().employees; }
+export function getHiringCandidates(): HiringCandidate[] { return loadHRData().hiringCandidates; }
+export function getHRDocuments(): HRDocument[] { return loadHRData().documents; }
+export function getOnboardingTasks(): OnboardingTask[] { return loadHRData().onboardingTasks; }
+export function getOfferLetters(): OfferLetter[] { return loadHRData().offerLetters; }
+export function getLeaveApplications(): LeaveApplication[] { return loadHRData().leaveApplications; }
