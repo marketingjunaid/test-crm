@@ -1,11 +1,15 @@
 import React, { createContext, useContext, useState } from 'react';
-import type { AppUser } from '../types';
+import type { AppUser, AppSection } from '../types';
 import { getUsers } from '../store/storage';
+import { canAccess as _canAccess, resolveAccess } from '../permissions';
 
 interface AuthContextType {
   currentUser: AppUser | null;
   login: (email: string, password: string) => boolean;
   logout: () => void;
+  canAccess: (section: AppSection) => boolean;
+  accessibleSections: AppSection[];
+  refreshSession: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -25,5 +29,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = () => { setCurrentUser(null); localStorage.removeItem('orgos_session'); };
 
-  return <AuthContext.Provider value={{ currentUser, login, logout }}>{children}</AuthContext.Provider>;
+  const refreshSession = () => {
+    if (!currentUser) return;
+    const users = getUsers();
+    const updated = users.find(u => u.id === currentUser.id);
+    if (updated) { setCurrentUser(updated); localStorage.setItem('orgos_session', JSON.stringify(updated)); }
+  };
+
+  const canAccessFn = (section: AppSection): boolean =>
+    currentUser ? _canAccess(currentUser, section) : false;
+
+  const accessibleSections = currentUser ? resolveAccess(currentUser) : [];
+
+  return (
+    <AuthContext.Provider value={{ currentUser, login, logout, canAccess: canAccessFn, accessibleSections, refreshSession }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };

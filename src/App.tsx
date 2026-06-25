@@ -1,7 +1,8 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { useAuth } from './contexts/AuthContext';
 import { Layout } from './components/Layout/Layout';
+import type { AppSection } from './types';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Leads from './pages/crm/Leads';
@@ -40,6 +41,12 @@ function RequireAuth() {
   return <Layout />;
 }
 
+function ProtectedSection({ section }: { section: AppSection }) {
+  const { canAccess } = useAuth();
+  if (!canAccess(section)) return <Navigate to="/" replace />;
+  return <Outlet />;
+}
+
 function AppRoutes() {
   const { currentUser } = useAuth();
   return (
@@ -47,35 +54,66 @@ function AppRoutes() {
       <Route path="/login" element={currentUser ? <Navigate to="/" replace /> : <Login />} />
       <Route element={<RequireAuth />}>
         <Route path="/" element={<Dashboard />} />
-        <Route path="/crm/leads" element={<Leads />} />
-        <Route path="/crm/contacts" element={<Contacts />} />
-        <Route path="/crm/companies" element={<CRMCompanies />} />
-        <Route path="/crm/deals" element={<Deals />} />
-        <Route path="/hr/employees" element={<Employees />} />
-        <Route path="/hr/leave" element={<LeaveManagement />} />
-        <Route path="/hr/hiring" element={<Hiring />} />
-        <Route path="/hr/onboarding" element={<Onboarding />} />
-        <Route path="/hr/attendance" element={<Attendance />} />
-        <Route path="/hr/payroll" element={<Payroll />} />
-        <Route path="/hr/performance" element={<Performance />} />
-        <Route path="/hr/documents" element={<HRDocuments />} />
-        <Route path="/finance/invoices" element={<Invoices />} />
-        <Route path="/finance/expenses" element={<Expenses />} />
-        <Route path="/finance/budget" element={<BudgetPage />} />
-        <Route path="/finance/reports" element={<FinanceReports />} />
-        <Route path="/projects" element={<Projects />} />
-        <Route path="/projects/tasks" element={<Tasks />} />
-        <Route path="/projects/timesheets" element={<Timesheets />} />
-        <Route path="/inventory/products" element={<Products />} />
-        <Route path="/inventory/stock" element={<Stock />} />
-        <Route path="/inventory/vendors" element={<Vendors />} />
-        <Route path="/inventory/purchase-orders" element={<PurchaseOrders />} />
-        <Route path="/support/tickets" element={<Tickets />} />
-        <Route path="/support/knowledge-base" element={<KnowledgeBase />} />
-        <Route path="/assets" element={<Assets />} />
-        <Route path="/announcements" element={<Announcements />} />
-        <Route path="/documents" element={<Documents />} />
-        <Route path="/settings" element={<Settings />} />
+
+        <Route element={<ProtectedSection section="crm" />}>
+          <Route path="/crm/leads" element={<Leads />} />
+          <Route path="/crm/contacts" element={<Contacts />} />
+          <Route path="/crm/companies" element={<CRMCompanies />} />
+          <Route path="/crm/deals" element={<Deals />} />
+        </Route>
+
+        <Route element={<ProtectedSection section="hr" />}>
+          <Route path="/hr/employees" element={<Employees />} />
+          <Route path="/hr/leave" element={<LeaveManagement />} />
+          <Route path="/hr/hiring" element={<Hiring />} />
+          <Route path="/hr/onboarding" element={<Onboarding />} />
+          <Route path="/hr/attendance" element={<Attendance />} />
+          <Route path="/hr/payroll" element={<Payroll />} />
+          <Route path="/hr/performance" element={<Performance />} />
+          <Route path="/hr/documents" element={<HRDocuments />} />
+        </Route>
+
+        <Route element={<ProtectedSection section="finance" />}>
+          <Route path="/finance/invoices" element={<Invoices />} />
+          <Route path="/finance/expenses" element={<Expenses />} />
+          <Route path="/finance/budget" element={<BudgetPage />} />
+          <Route path="/finance/reports" element={<FinanceReports />} />
+        </Route>
+
+        <Route element={<ProtectedSection section="projects" />}>
+          <Route path="/projects" element={<Projects />} />
+          <Route path="/projects/tasks" element={<Tasks />} />
+          <Route path="/projects/timesheets" element={<Timesheets />} />
+        </Route>
+
+        <Route element={<ProtectedSection section="inventory" />}>
+          <Route path="/inventory/products" element={<Products />} />
+          <Route path="/inventory/stock" element={<Stock />} />
+          <Route path="/inventory/vendors" element={<Vendors />} />
+          <Route path="/inventory/purchase-orders" element={<PurchaseOrders />} />
+        </Route>
+
+        <Route element={<ProtectedSection section="support" />}>
+          <Route path="/support/tickets" element={<Tickets />} />
+          <Route path="/support/knowledge-base" element={<KnowledgeBase />} />
+        </Route>
+
+        <Route element={<ProtectedSection section="assets" />}>
+          <Route path="/assets" element={<Assets />} />
+        </Route>
+
+        <Route element={<ProtectedSection section="announcements" />}>
+          <Route path="/announcements" element={<Announcements />} />
+        </Route>
+
+        <Route element={<ProtectedSection section="documents" />}>
+          <Route path="/documents" element={<Documents />} />
+        </Route>
+
+        <Route element={<ProtectedSection section="settings" />}>
+          <Route path="/settings" element={<Settings />} />
+        </Route>
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

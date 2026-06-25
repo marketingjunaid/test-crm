@@ -1,12 +1,18 @@
+export type AppSection =
+  | 'dashboard' | 'crm' | 'hr' | 'finance' | 'projects'
+  | 'inventory' | 'support' | 'assets' | 'announcements'
+  | 'documents' | 'settings';
+
 export interface AppUser {
   id: string;
   name: string;
   email: string;
   password: string;
-  role: 'Admin' | 'Manager' | 'Employee' | 'Viewer';
+  role: 'Super Admin' | 'Admin' | 'Manager' | 'Employee';
   department: string;
   status: 'Active' | 'Inactive';
   createdAt: string;
+  sectionOverrides?: AppSection[];
 }
 
 export interface CompanySettings {
