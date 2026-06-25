@@ -6,44 +6,51 @@ import {
   TrendingUp, FileText, Building2
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import type { AppSection } from '../../types';
 
 interface NavItem { label: string; path?: string; icon?: React.ReactNode; children?: NavItem[]; }
 
-const navItems: { section: string; items: NavItem[] }[] = [
-  { section: 'OVERVIEW', items: [{ label: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={16} /> }] },
-  { section: 'SALES', items: [{ label: 'CRM', icon: <TrendingUp size={16} />, children: [
+const navItems: { section: string; sectionKey: AppSection; items: NavItem[] }[] = [
+  { section: 'OVERVIEW', sectionKey: 'dashboard', items: [{ label: 'Dashboard', path: '/', icon: <LayoutDashboard size={16} /> }] },
+  { section: 'SALES', sectionKey: 'crm', items: [{ label: 'CRM', icon: <TrendingUp size={16} />, children: [
     { label: 'Leads', path: '/crm/leads' }, { label: 'Contacts', path: '/crm/contacts' },
     { label: 'Companies', path: '/crm/companies' }, { label: 'Deals', path: '/crm/deals' },
   ]}]},
-  { section: 'HUMAN RESOURCES', items: [{ label: 'HR', icon: <UserCheck size={16} />, children: [
+  { section: 'HUMAN RESOURCES', sectionKey: 'hr', items: [{ label: 'HR', icon: <UserCheck size={16} />, children: [
     { label: 'Employees', path: '/hr/employees' }, { label: 'Hiring', path: '/hr/hiring' },
     { label: 'Onboarding', path: '/hr/onboarding' }, { label: 'Leave', path: '/hr/leave' },
     { label: 'Attendance', path: '/hr/attendance' }, { label: 'Payroll', path: '/hr/payroll' },
     { label: 'Performance', path: '/hr/performance' }, { label: 'Documents', path: '/hr/documents' },
   ]}]},
-  { section: 'FINANCE', items: [{ label: 'Finance', icon: <DollarSign size={16} />, children: [
+  { section: 'FINANCE', sectionKey: 'finance', items: [{ label: 'Finance', icon: <DollarSign size={16} />, children: [
     { label: 'Invoices', path: '/finance/invoices' }, { label: 'Expenses', path: '/finance/expenses' },
     { label: 'Budget', path: '/finance/budget' }, { label: 'Reports', path: '/finance/reports' },
   ]}]},
-  { section: 'WORK', items: [{ label: 'Projects', icon: <Briefcase size={16} />, children: [
+  { section: 'WORK', sectionKey: 'projects', items: [{ label: 'Projects', icon: <Briefcase size={16} />, children: [
     { label: 'All Projects', path: '/projects' }, { label: 'Tasks', path: '/projects/tasks' },
     { label: 'Timesheets', path: '/projects/timesheets' },
   ]}]},
-  { section: 'OPERATIONS', items: [
+  { section: 'INVENTORY', sectionKey: 'inventory', items: [
     { label: 'Inventory', icon: <Package size={16} />, children: [
       { label: 'Products', path: '/inventory/products' }, { label: 'Stock', path: '/inventory/stock' },
-      { label: 'Purchase Orders', path: '/inventory/po' }, { label: 'Vendors', path: '/inventory/vendors' },
+      { label: 'Purchase Orders', path: '/inventory/purchase-orders' }, { label: 'Vendors', path: '/inventory/vendors' },
     ]},
+  ]},
+  { section: 'SUPPORT', sectionKey: 'support', items: [
     { label: 'Support', icon: <Headphones size={16} />, children: [
-      { label: 'Tickets', path: '/support/tickets' }, { label: 'Knowledge Base', path: '/support/kb' },
+      { label: 'Tickets', path: '/support/tickets' }, { label: 'Knowledge Base', path: '/support/knowledge-base' },
     ]},
+  ]},
+  { section: 'OPERATIONS', sectionKey: 'assets', items: [
     { label: 'Assets', path: '/assets', icon: <Monitor size={16} /> },
   ]},
-  { section: 'COMPANY', items: [
+  { section: 'COMPANY', sectionKey: 'announcements', items: [
     { label: 'Announcements', path: '/announcements', icon: <Bell size={16} /> },
+  ]},
+  { section: 'COMPANY', sectionKey: 'documents', items: [
     { label: 'Documents', path: '/documents', icon: <FileText size={16} /> },
   ]},
-  { section: 'ADMIN', items: [{ label: 'Settings', path: '/settings', icon: <Settings size={16} /> }] },
+  { section: 'ADMIN', sectionKey: 'settings', items: [{ label: 'Settings', path: '/settings', icon: <Settings size={16} /> }] },
 ];
 
 interface NavGroupProps { item: NavItem; }
@@ -83,7 +90,7 @@ const NavGroup: React.FC<NavGroupProps> = ({ item }) => {
 };
 
 export const Sidebar: React.FC = () => {
-  const { logout, currentUser } = useAuth();
+  const { logout, currentUser, canAccess } = useAuth();
 
   return (
     <div className="w-56 bg-slate-900 flex flex-col h-screen fixed left-0 top-0 z-30">
@@ -99,8 +106,8 @@ export const Sidebar: React.FC = () => {
 
       {/* Nav */}
       <div className="flex-1 overflow-y-auto py-4 px-3 sidebar-scroll">
-        {navItems.map(({ section, items }) => (
-          <div key={section} className="mb-5">
+        {navItems.filter(({ sectionKey }) => canAccess(sectionKey)).map(({ section, sectionKey, items }) => (
+          <div key={sectionKey} className="mb-5">
             <p className="text-[10px] font-semibold text-slate-600 uppercase tracking-widest px-3 mb-2">{section}</p>
             <div className="flex flex-col gap-0.5">
               {items.map(item => <NavGroup key={item.label} item={item} />)}

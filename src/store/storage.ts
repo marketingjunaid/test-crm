@@ -100,10 +100,27 @@ export const saveAnnouncements = (d: Announcement[]) => set(K.announcements, d);
 export const getNotifications = () => get<AppNotification>(K.notifications);
 export const saveNotifications = (d: AppNotification[]) => set(K.notifications, d);
 
+export function migrateData() {
+  const raw = localStorage.getItem(K.users);
+  if (!raw) return;
+  try {
+    const users: AppUser[] = JSON.parse(raw);
+    let changed = false;
+    const migrated = users.map(u => {
+      const role = u.role as string;
+      if (role === 'Viewer' || role === 'viewer') { changed = true; return { ...u, role: 'Employee' as const }; }
+      return u;
+    });
+    if (changed) localStorage.setItem(K.users, JSON.stringify(migrated));
+  } catch { /* ignore */ }
+}
+
 export function initializeData() {
+  migrateData();
   if (localStorage.getItem(K.initialized)) return;
 
   const users: AppUser[] = [
+    { id: '0', name: 'Super Admin', email: 'superadmin@acme.com', password: 'super123', role: 'Super Admin', department: 'Management', status: 'Active', createdAt: '2024-01-01' },
     { id: '1', name: 'Admin User', email: 'admin@acme.com', password: 'admin123', role: 'Admin', department: 'Management', status: 'Active', createdAt: '2024-01-01' },
     { id: '2', name: 'Sarah Manager', email: 'manager@acme.com', password: 'manager123', role: 'Manager', department: 'Sales', status: 'Active', createdAt: '2024-01-15' },
     { id: '3', name: 'John Employee', email: 'employee@acme.com', password: 'employee123', role: 'Employee', department: 'Engineering', status: 'Active', createdAt: '2024-02-01' },

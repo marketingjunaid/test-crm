@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { getCompany, saveCompany, getUsers, saveUsers } from '../../store/storage';
-import { CompanySettings, AppUser } from '../../types';
+import type { CompanySettings, AppUser, AppSection } from '../../types';
+import { ALL_SECTIONS, SECTION_LABELS, ROLE_DEFAULTS } from '../../permissions';
+import { useAuth } from '../../contexts/AuthContext';
 import PageHeader from '../../components/UI/PageHeader';
 import Button from '../../components/UI/Button';
 import Input from '../../components/UI/Input';
@@ -9,33 +11,123 @@ import Modal from '../../components/UI/Modal';
 import Badge from '../../components/UI/Badge';
 import { Save, Plus, Trash2, Edit2, Building2, Users, Bell, Shield } from 'lucide-react';
 
+interface UserForm {
+  name: string;
+  email: string;
+  password: string;
+  role: AppUser['role'];
+  department: string;
+  useCustomAccess: boolean;
+  sectionOverrides: AppSection[];
+}
+
 export default function Settings() {
+  const { currentUser, refreshSession } = useAuth();
   const [settings, setSettings] = useState<CompanySettings>(getCompany());
   const [users, setUsers] = useState<AppUser[]>(getUsers());
   const [activeTab, setActiveTab] = useState('company');
   const [saved, setSaved] = useState(false);
   const [showUserModal, setShowUserModal] = useState(false);
   const [editUser, setEditUser] = useState<AppUser | null>(null);
-  const [userForm, setUserForm] = useState({ name: '', email: '', password: '', role: 'Employee' as AppUser['role'], department: '' });
+  const [userForm, setUserForm] = useState<UserForm>({
+    name: '', email: '', password: '', role: 'Employee', department: '',
+    useCustomAccess: false, sectionOverrides: [],
+  });
 
-  const saveSettings = () => { saveCompany(settings); setSaved(true); setTimeout(() => setSaved(false), 2000); };
+  const isSuperAdmin = currentUser?.role === 'Super Admin';
+  const isAdmin = currentUser?.role === 'Admin';
+
+  const canManageUser = (u: AppUser) => {
+    if (isSuperAdmin) return true;
+    if (isAdmin && u.role === 'Super Admin') return false;
+    return isAdmin;
+  };
+
+  const availableRoles = (): AppUser['role'][] => {
+    if (isSuperAdmin) return ['Super Admin', 'Admin', 'Manager', 'Employee'];
+    if (isAdmin) return ['Admin', 'Manager', 'Employee'];
+    return [];
+  };
+
+  const visibleUsers = users.filter(u => {
+    if (isSuperAdmin) return true;
+    if (isAdmin) return u.role !== 'Super Admin';
+    return false;
+  });
+
+  const saveSettings = () => {
+    saveCompany(settings);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
 
   const openUserModal = (u?: AppUser) => {
-    if (u) { setEditUser(u); setUserForm({ name: u.name, email: u.email, password: u.password, role: u.role, department: u.department || '' }); }
-    else { setEditUser(null); setUserForm({ name: '', email: '', password: '', role: 'Employee', department: '' }); }
+    if (u) {
+      setEditUser(u);
+      setUserForm({
+        name: u.name, email: u.email, password: u.password,
+        role: u.role, department: u.department || '',
+        useCustomAccess: !!u.sectionOverrides,
+        sectionOverrides: u.sectionOverrides ?? ROLE_DEFAULTS[u.role],
+      });
+    } else {
+      setEditUser(null);
+      setUserForm({ name: '', email: '', password: '', role: 'Employee', department: '', useCustomAccess: false, sectionOverrides: [] });
+    }
     setShowUserModal(true);
   };
 
-  const saveUser = () => {
-    let updated: AppUser[];
-    if (editUser) { updated = users.map(u => u.id === editUser.id ? { ...u, ...userForm } : u); }
-    else { updated = [...users, { id: crypto.randomUUID(), ...userForm, status: 'Active' as AppUser['status'], createdAt: new Date().toISOString().split('T')[0] }]; }
-    saveUsers(updated); setUsers(updated); setShowUserModal(false);
+  const handleRoleChange = (role: AppUser['role']) => {
+    setUserForm(p => ({
+      ...p,
+      role,
+      sectionOverrides: p.useCustomAccess ? ROLE_DEFAULTS[role] : p.sectionOverrides,
+    }));
   };
 
-  const delUser = (id: string) => { const u = users.filter(u => u.id !== id); saveUsers(u); setUsers(u); };
+  const toggleSection = (section: AppSection) => {
+    setUserForm(p => ({
+      ...p,
+      sectionOverrides: p.sectionOverrides.includes(section)
+        ? p.sectionOverrides.filter(s => s !== section)
+        : [...p.sectionOverrides, section],
+    }));
+  };
 
-  const tabs = [{ id: 'company', label: 'Company', icon: <Building2 size={16} /> }, { id: 'users', label: 'Users', icon: <Users size={16} /> }, { id: 'notifications', label: 'Notifications', icon: <Bell size={16} /> }, { id: 'security', label: 'Security', icon: <Shield size={16} /> }];
+  const saveUser = () => {
+    const overrides = userForm.useCustomAccess ? userForm.sectionOverrides : undefined;
+    let updated: AppUser[];
+    if (editUser) {
+      updated = users.map(u => u.id === editUser.id
+        ? { ...u, name: userForm.name, email: userForm.email, password: userForm.password, role: userForm.role, department: userForm.department, sectionOverrides: overrides }
+        : u
+      );
+    } else {
+      updated = [...users, {
+        id: crypto.randomUUID(), name: userForm.name, email: userForm.email,
+        password: userForm.password, role: userForm.role, department: userForm.department,
+        status: 'Active' as const, createdAt: new Date().toISOString().split('T')[0],
+        sectionOverrides: overrides,
+      }];
+    }
+    saveUsers(updated);
+    setUsers(updated);
+    if (editUser && currentUser?.id === editUser.id) refreshSession();
+    setShowUserModal(false);
+  };
+
+  const delUser = (id: string) => {
+    const u = users.filter(u => u.id !== id);
+    saveUsers(u);
+    setUsers(u);
+  };
+
+  const tabs = [
+    { id: 'company', label: 'Company', icon: <Building2 size={16} /> },
+    { id: 'users', label: 'Users', icon: <Users size={16} /> },
+    { id: 'notifications', label: 'Notifications', icon: <Bell size={16} /> },
+    { id: 'security', label: 'Security', icon: <Shield size={16} /> },
+  ];
 
   return (
     <div>
@@ -77,23 +169,52 @@ export default function Settings() {
           {activeTab === 'users' && (
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
               <div className="p-5 border-b border-slate-100 flex items-center justify-between">
-                <div><h2 className="font-semibold text-slate-900">User Management</h2><p className="text-sm text-slate-500">{users.length} users</p></div>
-                <Button onClick={() => openUserModal()}><Plus size={16} className="mr-1" />Add User</Button>
+                <div>
+                  <h2 className="font-semibold text-slate-900">User Management</h2>
+                  <p className="text-sm text-slate-500">{visibleUsers.length} users</p>
+                </div>
+                {(isSuperAdmin || isAdmin) && (
+                  <Button onClick={() => openUserModal()}><Plus size={16} className="mr-1" />Add User</Button>
+                )}
               </div>
               <table className="w-full text-sm">
-                <thead><tr className="bg-slate-50"><th className="text-left px-5 py-3 font-medium text-slate-600">Name</th><th className="text-left px-5 py-3 font-medium text-slate-600">Email</th><th className="text-left px-5 py-3 font-medium text-slate-600">Role</th><th className="text-left px-5 py-3 font-medium text-slate-600">Department</th><th className="px-5 py-3"></th></tr></thead>
-                <tbody>{users.map(u => (
-                  <tr key={u.id} className="border-t border-slate-100 hover:bg-slate-50">
-                    <td className="px-5 py-3 font-medium text-slate-900">{u.name}</td>
-                    <td className="px-5 py-3 text-slate-500">{u.email}</td>
-                    <td className="px-5 py-3"><Badge status={u.role} /></td>
-                    <td className="px-5 py-3 text-slate-500">{u.department || '-'}</td>
-                    <td className="px-5 py-3 flex gap-1">
-                      <button onClick={() => openUserModal(u)} className="p-1.5 text-slate-400 hover:text-indigo-600 rounded"><Edit2 size={13} /></button>
-                      <button onClick={() => delUser(u.id)} className="p-1.5 text-slate-400 hover:text-red-500 rounded"><Trash2 size={13} /></button>
-                    </td>
+                <thead>
+                  <tr className="bg-slate-50">
+                    <th className="text-left px-5 py-3 font-medium text-slate-600">Name</th>
+                    <th className="text-left px-5 py-3 font-medium text-slate-600">Email</th>
+                    <th className="text-left px-5 py-3 font-medium text-slate-600">Role</th>
+                    <th className="text-left px-5 py-3 font-medium text-slate-600">Department</th>
+                    <th className="text-left px-5 py-3 font-medium text-slate-600">Access</th>
+                    <th className="px-5 py-3"></th>
                   </tr>
-                ))}</tbody>
+                </thead>
+                <tbody>
+                  {visibleUsers.map(u => (
+                    <tr key={u.id} className="border-t border-slate-100 hover:bg-slate-50">
+                      <td className="px-5 py-3 font-medium text-slate-900">{u.name}</td>
+                      <td className="px-5 py-3 text-slate-500">{u.email}</td>
+                      <td className="px-5 py-3"><Badge status={u.role} /></td>
+                      <td className="px-5 py-3 text-slate-500">{u.department || '-'}</td>
+                      <td className="px-5 py-3 text-slate-500 text-xs">
+                        {u.sectionOverrides ? (
+                          <span className="text-indigo-600 font-medium">Custom ({u.sectionOverrides.length})</span>
+                        ) : (
+                          <span>Role default</span>
+                        )}
+                      </td>
+                      <td className="px-5 py-3 flex gap-1">
+                        {canManageUser(u) && (
+                          <>
+                            <button onClick={() => openUserModal(u)} className="p-1.5 text-slate-400 hover:text-indigo-600 rounded"><Edit2 size={13} /></button>
+                            {u.id !== currentUser?.id && (
+                              <button onClick={() => delUser(u.id)} className="p-1.5 text-slate-400 hover:text-red-500 rounded"><Trash2 size={13} /></button>
+                            )}
+                          </>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
               </table>
             </div>
           )}
@@ -102,7 +223,13 @@ export default function Settings() {
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
               <h2 className="text-lg font-semibold text-slate-900 mb-6">Notification Preferences</h2>
               <div className="space-y-4">
-                {[['Leave Requests', 'Get notified when employees apply for leave'], ['New Tickets', 'Get notified when new support tickets are created'], ['Invoice Due', 'Get notified when invoices are due'], ['Low Stock', 'Get notified when stock falls below minimum level'], ['Task Deadlines', 'Get notified about upcoming task deadlines']].map(([label, desc]) => (
+                {[
+                  ['Leave Requests', 'Get notified when employees apply for leave'],
+                  ['New Tickets', 'Get notified when new support tickets are created'],
+                  ['Invoice Due', 'Get notified when invoices are due'],
+                  ['Low Stock', 'Get notified when stock falls below minimum level'],
+                  ['Task Deadlines', 'Get notified about upcoming task deadlines'],
+                ].map(([label, desc]) => (
                   <label key={label} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg cursor-pointer">
                     <div><p className="font-medium text-slate-800">{label}</p><p className="text-sm text-slate-500">{desc}</p></div>
                     <input type="checkbox" defaultChecked className="w-4 h-4 text-indigo-600 rounded border-slate-300" />
@@ -116,7 +243,11 @@ export default function Settings() {
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
               <h2 className="text-lg font-semibold text-slate-900 mb-6">Security Settings</h2>
               <div className="space-y-4">
-                {[['Two-Factor Authentication', 'Add an extra layer of security to accounts', false], ['Session Timeout', 'Auto-logout after 30 minutes of inactivity', true], ['Login Notifications', 'Get email on new sign-ins', true]].map(([label, desc, checked]) => (
+                {[
+                  ['Two-Factor Authentication', 'Add an extra layer of security to accounts', false],
+                  ['Session Timeout', 'Auto-logout after 30 minutes of inactivity', true],
+                  ['Login Notifications', 'Get email on new sign-ins', true],
+                ].map(([label, desc, checked]) => (
                   <label key={String(label)} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg cursor-pointer">
                     <div><p className="font-medium text-slate-800">{label}</p><p className="text-sm text-slate-500">{String(desc)}</p></div>
                     <input type="checkbox" defaultChecked={checked as boolean} className="w-4 h-4 text-indigo-600 rounded border-slate-300" />
@@ -125,7 +256,14 @@ export default function Settings() {
                 <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
                   <p className="text-sm font-medium text-amber-800">Data Management</p>
                   <p className="text-xs text-amber-600 mt-1">All data is stored locally in your browser. Export your data regularly as a backup.</p>
-                  <Button variant="secondary" className="mt-3" onClick={() => { const data = { ...localStorage }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'orgos-backup.json'; a.click(); }}>Export All Data</Button>
+                  <Button variant="secondary" className="mt-3" onClick={() => {
+                    const data = { ...localStorage };
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = 'orgos-backup.json';
+                    a.click();
+                  }}>Export All Data</Button>
                 </div>
               </div>
             </div>
@@ -138,10 +276,54 @@ export default function Settings() {
           <Input label="Full Name" value={userForm.name} onChange={e => setUserForm(p => ({ ...p, name: e.target.value }))} />
           <Input label="Email" value={userForm.email} onChange={e => setUserForm(p => ({ ...p, email: e.target.value }))} />
           <Input label="Password" type="password" value={userForm.password} onChange={e => setUserForm(p => ({ ...p, password: e.target.value }))} />
-          <Select label="Role" value={userForm.role} onChange={e => setUserForm(p => ({ ...p, role: e.target.value as AppUser['role'] }))} options={[{ value: 'Admin', label: 'Admin' }, { value: 'Manager', label: 'Manager' }, { value: 'Employee', label: 'Employee' }, { value: 'Viewer', label: 'Viewer' }]} />
+          <Select
+            label="Role"
+            value={userForm.role}
+            onChange={e => handleRoleChange(e.target.value as AppUser['role'])}
+            options={availableRoles().map(r => ({ value: r, label: r }))}
+          />
           <Input label="Department" value={userForm.department} onChange={e => setUserForm(p => ({ ...p, department: e.target.value }))} />
+
+          <div className="pt-2 border-t border-slate-100">
+            <label className="flex items-center gap-2 cursor-pointer mb-3">
+              <input
+                type="checkbox"
+                checked={userForm.useCustomAccess}
+                onChange={e => setUserForm(p => ({
+                  ...p,
+                  useCustomAccess: e.target.checked,
+                  sectionOverrides: e.target.checked ? ROLE_DEFAULTS[p.role] : [],
+                }))}
+                className="w-4 h-4 text-indigo-600 rounded border-slate-300"
+              />
+              <span className="text-sm font-medium text-slate-700">Customize section access</span>
+            </label>
+            {userForm.useCustomAccess && (
+              <div className="grid grid-cols-2 gap-2">
+                {ALL_SECTIONS.map(section => (
+                  <label key={section} className="flex items-center gap-2 p-2 rounded-lg bg-slate-50 cursor-pointer hover:bg-slate-100">
+                    <input
+                      type="checkbox"
+                      checked={userForm.sectionOverrides.includes(section)}
+                      onChange={() => toggleSection(section)}
+                      className="w-3.5 h-3.5 text-indigo-600 rounded border-slate-300"
+                    />
+                    <span className="text-xs text-slate-700">{SECTION_LABELS[section]}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+            {!userForm.useCustomAccess && (
+              <p className="text-xs text-slate-500">
+                Using role default: {ROLE_DEFAULTS[userForm.role].join(', ')}
+              </p>
+            )}
+          </div>
         </div>
-        <div className="flex justify-end gap-3 mt-4"><Button variant="secondary" onClick={() => setShowUserModal(false)}>Cancel</Button><Button onClick={saveUser}>Save</Button></div>
+        <div className="flex justify-end gap-3 mt-4">
+          <Button variant="secondary" onClick={() => setShowUserModal(false)}>Cancel</Button>
+          <Button onClick={saveUser}>Save</Button>
+        </div>
       </Modal>
     </div>
   );
