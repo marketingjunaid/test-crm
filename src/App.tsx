@@ -1,38 +1,84 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { AppProvider } from './contexts/AppContext';
+import { AuthProvider } from './contexts/AuthContext';
+import { useAuth } from './contexts/AuthContext';
 import { Layout } from './components/Layout/Layout';
-import { Login } from './pages/Login';
-import { Dashboard } from './pages/Dashboard';
-import { Leads } from './pages/Leads';
-import { Contacts } from './pages/Contacts';
-import { Companies } from './pages/Companies';
-import { Deals } from './pages/Deals';
-import { Tasks } from './pages/Tasks';
-import { Notes } from './pages/Notes';
-import { Settings } from './pages/Settings';
-import { HR } from './pages/HR';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import Leads from './pages/crm/Leads';
+import Contacts from './pages/crm/Contacts';
+import CRMCompanies from './pages/crm/CRMCompanies';
+import Deals from './pages/crm/Deals';
+import Employees from './pages/hr/Employees';
+import LeaveManagement from './pages/hr/LeaveManagement';
+import Hiring from './pages/hr/Hiring';
+import Onboarding from './pages/hr/Onboarding';
+import Attendance from './pages/hr/Attendance';
+import Payroll from './pages/hr/Payroll';
+import Performance from './pages/hr/Performance';
+import HRDocuments from './pages/hr/HRDocuments';
+import Invoices from './pages/finance/Invoices';
+import Expenses from './pages/finance/Expenses';
+import BudgetPage from './pages/finance/Budget';
+import FinanceReports from './pages/finance/FinanceReports';
+import Projects from './pages/projects/Projects';
+import Tasks from './pages/projects/Tasks';
+import Timesheets from './pages/projects/Timesheets';
+import Products from './pages/inventory/Products';
+import Stock from './pages/inventory/Stock';
+import Vendors from './pages/inventory/Vendors';
+import PurchaseOrders from './pages/inventory/PurchaseOrders';
+import Tickets from './pages/support/Tickets';
+import KnowledgeBase from './pages/support/KnowledgeBase';
+import Assets from './pages/Assets';
+import Announcements from './pages/Announcements';
+import Documents from './pages/Documents';
+import Settings from './pages/settings/Settings';
 
-function ProtectedRoutes() {
-  const { user } = useAuth();
-  if (!user) return <Navigate to="/login" replace />;
+function RequireAuth() {
+  const { currentUser } = useAuth();
+  if (!currentUser) return <Navigate to="/login" replace />;
+  return <Layout />;
+}
+
+function AppRoutes() {
+  const { currentUser } = useAuth();
   return (
-    <AppProvider>
-      <Layout>
-        <Routes>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/leads" element={<Leads />} />
-          <Route path="/contacts" element={<Contacts />} />
-          <Route path="/companies" element={<Companies />} />
-          <Route path="/deals" element={<Deals />} />
-          <Route path="/tasks" element={<Tasks />} />
-          <Route path="/notes" element={<Notes />} />
-          <Route path="/hr" element={<HR />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
-      </Layout>
-    </AppProvider>
+    <Routes>
+      <Route path="/login" element={currentUser ? <Navigate to="/" replace /> : <Login />} />
+      <Route element={<RequireAuth />}>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/crm/leads" element={<Leads />} />
+        <Route path="/crm/contacts" element={<Contacts />} />
+        <Route path="/crm/companies" element={<CRMCompanies />} />
+        <Route path="/crm/deals" element={<Deals />} />
+        <Route path="/hr/employees" element={<Employees />} />
+        <Route path="/hr/leave" element={<LeaveManagement />} />
+        <Route path="/hr/hiring" element={<Hiring />} />
+        <Route path="/hr/onboarding" element={<Onboarding />} />
+        <Route path="/hr/attendance" element={<Attendance />} />
+        <Route path="/hr/payroll" element={<Payroll />} />
+        <Route path="/hr/performance" element={<Performance />} />
+        <Route path="/hr/documents" element={<HRDocuments />} />
+        <Route path="/finance/invoices" element={<Invoices />} />
+        <Route path="/finance/expenses" element={<Expenses />} />
+        <Route path="/finance/budget" element={<BudgetPage />} />
+        <Route path="/finance/reports" element={<FinanceReports />} />
+        <Route path="/projects" element={<Projects />} />
+        <Route path="/projects/tasks" element={<Tasks />} />
+        <Route path="/projects/timesheets" element={<Timesheets />} />
+        <Route path="/inventory/products" element={<Products />} />
+        <Route path="/inventory/stock" element={<Stock />} />
+        <Route path="/inventory/vendors" element={<Vendors />} />
+        <Route path="/inventory/purchase-orders" element={<PurchaseOrders />} />
+        <Route path="/support/tickets" element={<Tickets />} />
+        <Route path="/support/knowledge-base" element={<KnowledgeBase />} />
+        <Route path="/assets" element={<Assets />} />
+        <Route path="/announcements" element={<Announcements />} />
+        <Route path="/documents" element={<Documents />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Route>
+    </Routes>
   );
 }
 
@@ -40,10 +86,7 @@ export default function App() {
   return (
     <BrowserRouter basename="/test-crm">
       <AuthProvider>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/*" element={<ProtectedRoutes />} />
-        </Routes>
+        <AppRoutes />
       </AuthProvider>
     </BrowserRouter>
   );

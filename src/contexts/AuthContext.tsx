@@ -1,51 +1,29 @@
 import React, { createContext, useContext, useState } from 'react';
-import type { User } from '../types';
+import type { AppUser } from '../types';
+import { getUsers } from '../store/storage';
 
 interface AuthContextType {
-  user: User | null;
+  currentUser: AppUser | null;
   login: (email: string, password: string) => boolean;
   logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType | null>(null);
+const AuthContext = createContext<AuthContextType>({} as AuthContextType);
+export const useAuth = () => useContext(AuthContext);
 
-const DEMO_USER: User = {
-  id: '1',
-  name: 'Demo User',
-  email: 'demo@crm.com',
-  role: 'Admin',
-  avatar: 'DU',
-};
-
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => {
-    const stored = localStorage.getItem('crm_user');
-    return stored ? (JSON.parse(stored) as User) : null;
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [currentUser, setCurrentUser] = useState<AppUser | null>(() => {
+    try { const s = localStorage.getItem('orgos_session'); return s ? JSON.parse(s) : null; } catch { return null; }
   });
 
   const login = (email: string, password: string): boolean => {
-    if (email === 'demo@crm.com' && password === 'demo123') {
-      setUser(DEMO_USER);
-      localStorage.setItem('crm_user', JSON.stringify(DEMO_USER));
-      return true;
-    }
+    const users = getUsers();
+    const user = users.find(u => u.email === email && u.password === password && u.status === 'Active');
+    if (user) { setCurrentUser(user); localStorage.setItem('orgos_session', JSON.stringify(user)); return true; }
     return false;
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('crm_user');
-  };
+  const logout = () => { setCurrentUser(null); localStorage.removeItem('orgos_session'); };
 
-  return (
-    <AuthContext.Provider value={{ user, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
-
-export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
-  return ctx;
-}
+  return <AuthContext.Provider value={{ currentUser, login, logout }}>{children}</AuthContext.Provider>;
+};

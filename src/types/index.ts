@@ -1,92 +1,79 @@
+export interface AppUser {
+  id: string;
+  name: string;
+  email: string;
+  password: string;
+  role: 'Admin' | 'Manager' | 'Employee' | 'Viewer';
+  department: string;
+  status: 'Active' | 'Inactive';
+  createdAt: string;
+}
+
+export interface CompanySettings {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  website: string;
+  currency: string;
+  annualLeaves: number;
+}
+
+export interface Department {
+  id: string;
+  name: string;
+  head: string;
+}
+
 export interface Lead {
   id: string;
   name: string;
   email: string;
   phone: string;
   company: string;
-  status: 'New' | 'Contacted' | 'Qualified' | 'Lost';
   source: string;
+  status: 'New' | 'Contacted' | 'Qualified' | 'Lost';
+  priority: 'Low' | 'Medium' | 'High';
+  assignedTo: string;
+  notes: string;
   createdAt: string;
-  updatedAt: string;
 }
 
 export interface Contact {
   id: string;
-  firstName: string;
-  lastName: string;
+  name: string;
   email: string;
   phone: string;
   company: string;
   title: string;
+  notes: string;
   createdAt: string;
-  updatedAt: string;
 }
 
-export interface Company {
+export interface CRMCompany {
   id: string;
   name: string;
   industry: string;
   website: string;
   phone: string;
-  employees: number;
-  revenue: string;
+  email: string;
+  size: string;
+  notes: string;
   createdAt: string;
-  updatedAt: string;
 }
-
-export type DealStage = 'Prospecting' | 'Qualification' | 'Proposal' | 'Negotiation' | 'Closed Won' | 'Closed Lost';
 
 export interface Deal {
   id: string;
   title: string;
-  value: number;
-  stage: DealStage;
   company: string;
   contact: string;
-  closeDate: string;
+  value: number;
+  stage: 'Prospect' | 'Qualified' | 'Proposal' | 'Negotiation' | 'Won' | 'Lost';
   probability: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface Task {
-  id: string;
-  title: string;
-  description: string;
-  dueDate: string;
-  priority: 'Low' | 'Medium' | 'High';
-  status: 'Open' | 'In Progress' | 'Done';
+  expectedClose: string;
   assignedTo: string;
-  relatedTo: string;
+  notes: string;
   createdAt: string;
-  updatedAt: string;
-}
-
-export interface Note {
-  id: string;
-  title: string;
-  content: string;
-  relatedTo: string;
-  relatedType: 'Lead' | 'Contact' | 'Company' | 'Deal';
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  avatar: string;
-}
-
-export interface AppData {
-  leads: Lead[];
-  contacts: Contact[];
-  companies: Company[];
-  deals: Deal[];
-  tasks: Task[];
-  notes: Note[];
 }
 
 export interface Employee {
@@ -96,60 +83,49 @@ export interface Employee {
   phone: string;
   role: string;
   department: string;
+  salary: number;
   joinDate: string;
   status: 'Active' | 'Inactive';
-  salary: number;
+  contractType: 'Full-time' | 'Part-time' | 'Contract';
+  createdAt: string;
+}
+
+export interface HiringJob {
+  id: string;
+  title: string;
+  department: string;
+  description: string;
+  requirements: string;
+  status: 'Open' | 'Closed';
   createdAt: string;
 }
 
 export interface HiringCandidate {
   id: string;
+  jobId: string;
+  jobTitle: string;
   name: string;
   email: string;
   phone: string;
-  position: string;
-  stage: 'Applied' | 'Interview' | 'Offer' | 'Hired' | 'Rejected';
+  stage: 'Applied' | 'Screening' | 'Interview' | 'Offer' | 'Hired' | 'Rejected';
   notes: string;
   appliedDate: string;
-  createdAt: string;
-}
-
-export interface HRDocument {
-  id: string;
-  employeeId: string;
-  employeeName: string;
-  name: string;
-  type: 'Offer Letter' | 'ID Proof' | 'Contract' | 'NDA' | 'Other';
-  fileData: string;
-  fileName: string;
-  uploadedAt: string;
 }
 
 export interface OnboardingTask {
   id: string;
   employeeId: string;
-  employeeName: string;
   task: string;
   completed: boolean;
   dueDate: string;
   completedAt?: string;
 }
 
-export interface OfferLetter {
-  id: string;
-  candidateName: string;
-  position: string;
-  department: string;
-  salary: number;
-  startDate: string;
-  createdAt: string;
-  status: 'Draft' | 'Sent' | 'Accepted' | 'Declined';
-}
-
 export interface LeaveApplication {
   id: string;
   employeeId: string;
   employeeName: string;
+  type: 'Annual' | 'Sick' | 'Emergency' | 'Unpaid';
   fromDate: string;
   toDate: string;
   days: number;
@@ -158,11 +134,250 @@ export interface LeaveApplication {
   appliedAt: string;
 }
 
-export interface HRData {
-  employees: Employee[];
-  hiringCandidates: HiringCandidate[];
-  documents: HRDocument[];
-  onboardingTasks: OnboardingTask[];
-  offerLetters: OfferLetter[];
-  leaveApplications: LeaveApplication[];
+export interface AttendanceRecord {
+  id: string;
+  employeeId: string;
+  employeeName: string;
+  date: string;
+  status: 'Present' | 'Absent' | 'Half Day' | 'WFH' | 'Leave';
+}
+
+export interface PayrollRecord {
+  id: string;
+  employeeId: string;
+  employeeName: string;
+  month: string;
+  year: number;
+  basicSalary: number;
+  allowances: number;
+  deductions: number;
+  netSalary: number;
+  status: 'Draft' | 'Processed' | 'Paid';
+}
+
+export interface PerformanceReview {
+  id: string;
+  employeeId: string;
+  employeeName: string;
+  period: string;
+  goals: string;
+  rating: number;
+  managerComments: string;
+  selfAssessment: string;
+  status: 'Draft' | 'Submitted' | 'Reviewed';
+  createdAt: string;
+}
+
+export interface HRDocument {
+  id: string;
+  employeeId: string;
+  employeeName: string;
+  name: string;
+  type: string;
+  fileName: string;
+  uploadedAt: string;
+}
+
+export interface InvoiceItem {
+  id: string;
+  description: string;
+  quantity: number;
+  rate: number;
+  amount: number;
+}
+
+export interface Invoice {
+  id: string;
+  invoiceNumber: string;
+  clientName: string;
+  clientEmail: string;
+  items: InvoiceItem[];
+  subtotal: number;
+  tax: number;
+  discount: number;
+  total: number;
+  status: 'Draft' | 'Sent' | 'Paid' | 'Overdue' | 'Cancelled';
+  issueDate: string;
+  dueDate: string;
+  notes: string;
+  createdAt: string;
+}
+
+export interface Expense {
+  id: string;
+  title: string;
+  category: string;
+  amount: number;
+  date: string;
+  paidBy: string;
+  description: string;
+  status: 'Pending' | 'Approved' | 'Rejected';
+  submittedBy: string;
+  createdAt: string;
+}
+
+export interface Budget {
+  id: string;
+  department: string;
+  year: number;
+  totalBudget: number;
+  spent: number;
+  category: string;
+  notes: string;
+}
+
+export interface Project {
+  id: string;
+  name: string;
+  client: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  budget: number;
+  status: 'Planning' | 'Active' | 'On Hold' | 'Completed' | 'Cancelled';
+  health: 'On Track' | 'At Risk' | 'Delayed';
+  team: string[];
+  createdAt: string;
+}
+
+export interface Task {
+  id: string;
+  projectId?: string;
+  title: string;
+  description: string;
+  assignedTo: string;
+  priority: 'Low' | 'Medium' | 'High' | 'Urgent';
+  status: 'To Do' | 'In Progress' | 'Review' | 'Done';
+  dueDate: string;
+  createdAt: string;
+}
+
+export interface Timesheet {
+  id: string;
+  employeeId: string;
+  employeeName: string;
+  projectId: string;
+  projectName: string;
+  date: string;
+  hours: number;
+  description: string;
+  billable: boolean;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  sku: string;
+  category: string;
+  unit: string;
+  costPrice: number;
+  sellingPrice: number;
+  currentStock: number;
+  reorderLevel: number;
+  description: string;
+  createdAt: string;
+}
+
+export interface StockMovement {
+  id: string;
+  productId: string;
+  productName: string;
+  type: 'In' | 'Out' | 'Adjustment';
+  quantity: number;
+  reason: string;
+  date: string;
+  createdAt: string;
+}
+
+export interface Vendor {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  category: string;
+  paymentTerms: string;
+  address: string;
+  rating: number;
+  notes: string;
+  createdAt: string;
+}
+
+export interface POItem {
+  id: string;
+  productName: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+}
+
+export interface PurchaseOrder {
+  id: string;
+  poNumber: string;
+  vendorId: string;
+  vendorName: string;
+  items: POItem[];
+  total: number;
+  status: 'Draft' | 'Sent' | 'Received' | 'Cancelled';
+  orderDate: string;
+  expectedDelivery: string;
+  notes: string;
+  createdAt: string;
+}
+
+export interface Ticket {
+  id: string;
+  ticketNumber: string;
+  subject: string;
+  description: string;
+  category: string;
+  priority: 'Low' | 'Medium' | 'High' | 'Urgent';
+  status: 'Open' | 'In Progress' | 'On Hold' | 'Resolved' | 'Closed';
+  assignedTo: string;
+  submittedBy: string;
+  notes: string;
+  createdAt: string;
+}
+
+export interface KBArticle {
+  id: string;
+  title: string;
+  category: string;
+  content: string;
+  status: 'Draft' | 'Published';
+  author: string;
+  createdAt: string;
+}
+
+export interface Asset {
+  id: string;
+  name: string;
+  type: string;
+  serialNumber: string;
+  purchaseDate: string;
+  cost: number;
+  assignedTo: string;
+  location: string;
+  status: 'Available' | 'Assigned' | 'Under Maintenance' | 'Retired';
+  notes: string;
+  createdAt: string;
+}
+
+export interface Announcement {
+  id: string;
+  title: string;
+  content: string;
+  department: string;
+  priority: 'Normal' | 'Important' | 'Urgent';
+  pinned: boolean;
+  createdBy: string;
+  createdAt: string;
+}
+
+export interface AppNotification {
+  id: string;
+  title: string;
+  message: string;
+  type: 'info' | 'success' | 'warning' | 'error';
+  read: boolean;
+  createdAt: string;
 }
