@@ -924,9 +924,26 @@ export default function Chat() {
   if (!currentUser) return null;
 
   return (
-    <div className="flex h-[calc(100vh-64px)] bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <div className="flex flex-col h-screen bg-slate-100 overflow-hidden">
+      {/* ── App top bar ──────────────────────────────────────────── */}
+      <div className="flex items-center gap-3 px-4 h-12 bg-slate-900 flex-shrink-0">
+        <div className="w-6 h-6 bg-indigo-600 rounded-md flex items-center justify-center flex-shrink-0">
+          <MessageSquare size={13} className="text-white" />
+        </div>
+        <span className="text-white font-bold text-sm tracking-tight">OrgOS Chat</span>
+        <span className="text-slate-500 text-xs ml-1">— Team Messaging</span>
+        <div className="ml-auto flex items-center gap-2">
+          <div className={`w-6 h-6 ${avatarColor(currentUser.id)} rounded-full flex items-center justify-center text-white text-[10px] font-bold`}>
+            {getUserInitial(currentUser.name)}
+          </div>
+          <span className="text-slate-300 text-xs">{currentUser.name}</span>
+        </div>
+      </div>
+
+      {/* ── Main chat area ────────────────────────────────────────── */}
+      <div className="flex flex-1 overflow-hidden">
       {/* ── Channels sidebar ─────────────────────────────────────── */}
-      <div className="w-60 bg-slate-900 flex flex-col flex-shrink-0">
+      <div className="w-64 bg-slate-900 flex flex-col flex-shrink-0">
         <div className="px-3 py-4 border-b border-slate-800">
           <div className="relative">
             <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500" />
@@ -1143,6 +1160,8 @@ export default function Chat() {
             onUpdate={loadMessages}
           />
         )}
+      </div>
+
       </div>
 
       {showCreateChannel && (

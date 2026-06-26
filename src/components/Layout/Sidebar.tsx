@@ -8,11 +8,11 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import type { AppSection } from '../../types';
 
-interface NavItem { label: string; path?: string; icon?: React.ReactNode; children?: NavItem[]; }
+interface NavItem { label: string; path?: string; icon?: React.ReactNode; children?: NavItem[]; newTab?: boolean; }
 
 const navItems: { section: string; sectionKey: AppSection; items: NavItem[] }[] = [
   { section: 'OVERVIEW', sectionKey: 'dashboard', items: [{ label: 'Dashboard', path: '/', icon: <LayoutDashboard size={16} /> }] },
-  { section: 'MESSAGING', sectionKey: 'chat', items: [{ label: 'Team Chat', path: '/chat', icon: <MessageSquare size={16} /> }] },
+  { section: 'MESSAGING', sectionKey: 'chat', items: [{ label: 'Team Chat', path: '/chat', icon: <MessageSquare size={16} />, newTab: true }] },
   { section: 'SALES', sectionKey: 'crm', items: [{ label: 'CRM', icon: <TrendingUp size={16} />, children: [
     { label: 'Leads', path: '/crm/leads' }, { label: 'Contacts', path: '/crm/contacts' },
     { label: 'Companies', path: '/crm/companies' }, { label: 'Deals', path: '/crm/deals' },
@@ -62,6 +62,20 @@ const NavGroup: React.FC<NavGroupProps> = ({ item }) => {
   const [open, setOpen] = useState(isChildActive || false);
 
   if (item.path) {
+    if (item.newTab) {
+      return (
+        <a
+          href={`/test-crm${item.path}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all text-slate-400 hover:text-white hover:bg-slate-800"
+        >
+          {item.icon}
+          <span>{item.label}</span>
+          <svg className="ml-auto opacity-40" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 9L9 1M9 1H3M9 1V7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </a>
+      );
+    }
     return (
       <NavLink to={item.path} className={({ isActive }) =>
         `flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all ${isActive ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`

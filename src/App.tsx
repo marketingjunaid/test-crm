@@ -42,6 +42,13 @@ function RequireAuth() {
   return <Layout />;
 }
 
+function RequireChat() {
+  const { currentUser, canAccess } = useAuth();
+  if (!currentUser) return <Navigate to="/login" replace />;
+  if (!canAccess('chat')) return <Navigate to="/" replace />;
+  return <Outlet />;
+}
+
 function ProtectedSection({ section }: { section: AppSection }) {
   const { canAccess } = useAuth();
   if (!canAccess(section)) return <Navigate to="/" replace />;
@@ -53,13 +60,15 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={currentUser ? <Navigate to="/" replace /> : <Login />} />
+
+      {/* Standalone chat — full screen, no sidebar/header, shared localStorage auth */}
+      <Route element={<RequireChat />}>
+        <Route path="/chat" element={<Chat />} />
+        <Route path="/chat/:channelId" element={<Chat />} />
+      </Route>
+
       <Route element={<RequireAuth />}>
         <Route path="/" element={<Dashboard />} />
-
-        <Route element={<ProtectedSection section="chat" />}>
-          <Route path="/chat" element={<Chat />} />
-          <Route path="/chat/:channelId" element={<Chat />} />
-        </Route>
 
         <Route element={<ProtectedSection section="crm" />}>
           <Route path="/crm/leads" element={<Leads />} />
