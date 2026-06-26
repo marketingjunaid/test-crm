@@ -5,6 +5,7 @@ import { Layout } from './components/Layout/Layout';
 import type { AppSection } from './types';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import Chat from './pages/chat/Chat';
 import Leads from './pages/crm/Leads';
 import Contacts from './pages/crm/Contacts';
 import CRMCompanies from './pages/crm/CRMCompanies';
@@ -54,6 +55,11 @@ function AppRoutes() {
       <Route path="/login" element={currentUser ? <Navigate to="/" replace /> : <Login />} />
       <Route element={<RequireAuth />}>
         <Route path="/" element={<Dashboard />} />
+
+        <Route element={<ProtectedSection section="chat" />}>
+          <Route path="/chat" element={<Chat />} />
+          <Route path="/chat/:channelId" element={<Chat />} />
+        </Route>
 
         <Route element={<ProtectedSection section="crm" />}>
           <Route path="/crm/leads" element={<Leads />} />

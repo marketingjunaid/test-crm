@@ -1,7 +1,7 @@
 export type AppSection =
   | 'dashboard' | 'crm' | 'hr' | 'finance' | 'projects'
   | 'inventory' | 'support' | 'assets' | 'announcements'
-  | 'documents' | 'settings';
+  | 'documents' | 'settings' | 'chat';
 
 export interface AppUser {
   id: string;

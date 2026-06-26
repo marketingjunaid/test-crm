@@ -104,14 +104,27 @@ export function migrateData() {
   const raw = localStorage.getItem(K.users);
   if (!raw) return;
   try {
-    const users: AppUser[] = JSON.parse(raw);
+    let users: AppUser[] = JSON.parse(raw);
     let changed = false;
-    const migrated = users.map(u => {
+
+    // Remap legacy 'Viewer' role
+    users = users.map(u => {
       const role = u.role as string;
       if (role === 'Viewer' || role === 'viewer') { changed = true; return { ...u, role: 'Employee' as const }; }
       return u;
     });
-    if (changed) localStorage.setItem(K.users, JSON.stringify(migrated));
+
+    // Ensure a Super Admin always exists
+    const hasSuperAdmin = users.some(u => u.role === 'Super Admin');
+    if (!hasSuperAdmin) {
+      users = [
+        { id: 'superadmin', name: 'Super Admin', email: 'superadmin@acme.com', password: 'super123', role: 'Super Admin', department: 'Management', status: 'Active', createdAt: '2024-01-01' },
+        ...users,
+      ];
+      changed = true;
+    }
+
+    if (changed) localStorage.setItem(K.users, JSON.stringify(users));
   } catch { /* ignore */ }
 }
 
