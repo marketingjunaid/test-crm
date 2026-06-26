@@ -1,23 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bell, LogOut } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { getNotifications, saveNotifications } from '../../store/storage';
+import ThemeToggle from '../UI/ThemeToggle';
+import KeyboardShortcutsModal from '../UI/KeyboardShortcutsModal';
+import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
+import { seedNotifications } from '../../utils/notifications';
 
 export const Header: React.FC = () => {
   const { currentUser, logout } = useAuth();
   const [showNotifs, setShowNotifs] = useState(false);
   const [showUser, setShowUser] = useState(false);
-  const notifs = getNotifications();
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  const [notifs, setNotifs] = useState(getNotifications());
   const unread = notifs.filter(n => !n.read).length;
 
+  useEffect(() => { seedNotifications(); setNotifs(getNotifications()); }, []);
+  useKeyboardShortcuts(() => setShowShortcuts(true));
+
   const markAllRead = () => {
-    saveNotifications(notifs.map(n => ({ ...n, read: true })));
+    const updated = notifs.map(n => ({ ...n, read: true }));
+    saveNotifications(updated);
+    setNotifs(updated);
     setShowNotifs(false);
-    window.location.reload();
   };
 
   return (
-    <header className="h-14 bg-white border-b border-slate-100 flex items-center justify-end px-6 gap-3 sticky top-0 z-20">
+    <header className="h-14 bg-white border-b border-slate-100 flex items-center justify-between px-6 gap-3 sticky top-0 z-20">
+      <ThemeToggle />
       {/* Notifications */}
       <div className="relative">
         <button onClick={() => { setShowNotifs(!showNotifs); setShowUser(false); }}
@@ -71,6 +81,7 @@ export const Header: React.FC = () => {
 
       {showNotifs && <div className="fixed inset-0 z-40" onClick={() => setShowNotifs(false)} />}
       {showUser && <div className="fixed inset-0 z-40" onClick={() => setShowUser(false)} />}
+      <KeyboardShortcutsModal isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
     </header>
   );
 };

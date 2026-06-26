@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { useAuth } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { Layout } from './components/Layout/Layout';
 import type { AppSection } from './types';
 import Login from './pages/Login';
@@ -19,6 +20,7 @@ import Attendance from './pages/hr/Attendance';
 import Payroll from './pages/hr/Payroll';
 import Performance from './pages/hr/Performance';
 import HRDocuments from './pages/hr/HRDocuments';
+import OrgChart from './pages/hr/OrgChart';
 import Invoices from './pages/finance/Invoices';
 import Expenses from './pages/finance/Expenses';
 import BudgetPage from './pages/finance/Budget';
@@ -91,6 +93,7 @@ function AppRoutes() {
           <Route path="/hr/payroll" element={<Payroll />} />
           <Route path="/hr/performance" element={<Performance />} />
           <Route path="/hr/documents" element={<HRDocuments />} />
+          <Route path="/hr/org-chart" element={<OrgChart />} />
         </Route>
 
         <Route element={<ProtectedSection section="finance" />}>
@@ -143,9 +146,11 @@ function AppRoutes() {
 export default function App() {
   return (
     <BrowserRouter basename="/test-crm">
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }

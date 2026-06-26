@@ -399,5 +399,6 @@ export interface AppNotification {
   type: 'info' | 'success' | 'warning' | 'error';
   read: boolean;
   createdAt: string;
+  link?: string;
 }
 
