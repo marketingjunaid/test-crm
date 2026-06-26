@@ -6,6 +6,7 @@ import type { AppSection } from './types';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Chat from './pages/chat/Chat';
+import CalendarPage from './pages/Calendar';
 import Leads from './pages/crm/Leads';
 import Contacts from './pages/crm/Contacts';
 import CRMCompanies from './pages/crm/CRMCompanies';
@@ -69,6 +70,10 @@ function AppRoutes() {
 
       <Route element={<RequireAuth />}>
         <Route path="/" element={<Dashboard />} />
+
+        <Route element={<ProtectedSection section="calendar" />}>
+          <Route path="/calendar" element={<CalendarPage />} />
+        </Route>
 
         <Route element={<ProtectedSection section="crm" />}>
           <Route path="/crm/leads" element={<Leads />} />

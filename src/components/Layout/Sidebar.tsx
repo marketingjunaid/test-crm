@@ -3,7 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Users, UserCheck, DollarSign, Briefcase, Package,
   Headphones, Monitor, Bell, Settings, ChevronDown, ChevronRight,
-  TrendingUp, FileText, Building2, MessageSquare
+  TrendingUp, FileText, Building2, MessageSquare, CalendarDays
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import type { AppSection } from '../../types';
@@ -13,6 +13,7 @@ interface NavItem { label: string; path?: string; icon?: React.ReactNode; childr
 const navItems: { section: string; sectionKey: AppSection; items: NavItem[] }[] = [
   { section: 'OVERVIEW', sectionKey: 'dashboard', items: [{ label: 'Dashboard', path: '/', icon: <LayoutDashboard size={16} /> }] },
   { section: 'MESSAGING', sectionKey: 'chat', items: [{ label: 'Team Chat', path: '/chat', icon: <MessageSquare size={16} />, newTab: true }] },
+  { section: 'OVERVIEW', sectionKey: 'calendar', items: [{ label: 'Calendar', path: '/calendar', icon: <CalendarDays size={16} /> }] },
   { section: 'SALES', sectionKey: 'crm', items: [{ label: 'CRM', icon: <TrendingUp size={16} />, children: [
     { label: 'Leads', path: '/crm/leads' }, { label: 'Contacts', path: '/crm/contacts' },
     { label: 'Companies', path: '/crm/companies' }, { label: 'Deals', path: '/crm/deals' },

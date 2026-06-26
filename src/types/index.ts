@@ -1,7 +1,20 @@
 export type AppSection =
   | 'dashboard' | 'crm' | 'hr' | 'finance' | 'projects'
   | 'inventory' | 'support' | 'assets' | 'announcements'
-  | 'documents' | 'settings' | 'chat';
+  | 'documents' | 'settings' | 'chat' | 'calendar';
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  date: string;
+  endDate?: string;
+  time?: string;
+  endTime?: string;
+  type: 'holiday' | 'leave' | 'deadline' | 'event' | 'meeting';
+  description?: string;
+  createdBy: string;
+  allDay: boolean;
+}
 
 export interface AppUser {
   id: string;

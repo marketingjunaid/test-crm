@@ -4,7 +4,7 @@ import type {
   AttendanceRecord, PayrollRecord, PerformanceReview, HRDocument,
   Invoice, InvoiceItem, Expense, Budget, Project, Task, Timesheet,
   Product, StockMovement, Vendor, PurchaseOrder, Ticket, KBArticle,
-  Asset, Announcement, AppNotification
+  Asset, Announcement, AppNotification, CalendarEvent
 } from '../types';
 
 const K = {
@@ -18,6 +18,7 @@ const K = {
   products: 'orgos_products', stock: 'orgos_stock', vendors: 'orgos_vendors', pos: 'orgos_pos',
   tickets: 'orgos_tickets', kb: 'orgos_kb', assets: 'orgos_assets',
   announcements: 'orgos_announcements', notifications: 'orgos_notifications',
+  calendarEvents: 'orgos_calendar_events',
   initialized: 'orgos_initialized',
 };
 
@@ -46,6 +47,9 @@ export const getCRMCompanies = () => get<CRMCompany>(K.crmCompanies);
 export const saveCRMCompanies = (d: CRMCompany[]) => set(K.crmCompanies, d);
 export const getDeals = () => get<Deal>(K.deals);
 export const saveDeals = (d: Deal[]) => set(K.deals, d);
+
+export const getCalendarEvents = () => get<CalendarEvent>(K.calendarEvents);
+export const saveCalendarEvents = (d: CalendarEvent[]) => set(K.calendarEvents, d);
 
 export const getEmployees = () => get<Employee>(K.employees);
 export const saveEmployees = (d: Employee[]) => set(K.employees, d);
