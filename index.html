@@ -4,7 +4,20 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CRM Pro</title>
+    <title>OrgOS</title>
+    <script>
+      // Restore path encoded by 404.html redirect
+      (function() {
+        var l = window.location;
+        if (l.search[1] === 'p') {
+          var params = l.search.slice(1).split('&');
+          var path = params[0].slice(2);
+          var query = params[1] ? '?' + decodeURIComponent(params[1].slice(2)) : '';
+          var hash = l.hash;
+          history.replaceState(null, null, l.pathname.slice(0, -1) + (path ? '/' + path : '') + query + hash);
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

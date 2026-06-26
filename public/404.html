@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <script>
+    // GitHub Pages 404 → SPA redirect trick
+    // Encode the full path into a query param, then redirect to the root
+    // so the SPA can pick it up and restore the URL via history.replaceState.
+    var l = window.location;
+    var segmentCount = 1; // number of path segments in the repo base path (/test-crm)
+    var path = l.pathname.slice(1).split('/').slice(segmentCount).join('/');
+    var query = '?p=/' + path + (l.search ? '&q=' + l.search.slice(1) : '') + l.hash;
+    l.replace(l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') + l.pathname.split('/').slice(0, segmentCount + 1).join('/') + '/' + query);
+  </script>
+</head>
+<body>Redirecting…</body>
+</html>
