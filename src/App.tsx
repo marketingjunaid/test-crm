@@ -42,11 +42,11 @@ function RequireAuth() {
   return <Layout />;
 }
 
-function RequireChat() {
+function StandaloneChatGuard() {
   const { currentUser, canAccess } = useAuth();
   if (!currentUser) return <Navigate to="/login" replace />;
   if (!canAccess('chat')) return <Navigate to="/" replace />;
-  return <Outlet />;
+  return <Chat standalone />;
 }
 
 function ProtectedSection({ section }: { section: AppSection }) {
@@ -57,15 +57,15 @@ function ProtectedSection({ section }: { section: AppSection }) {
 
 function AppRoutes() {
   const { currentUser } = useAuth();
+  const isStandaloneChat = new URLSearchParams(window.location.search).get('mode') === 'chat';
+
+  if (isStandaloneChat) {
+    return <StandaloneChatGuard />;
+  }
+
   return (
     <Routes>
       <Route path="/login" element={currentUser ? <Navigate to="/" replace /> : <Login />} />
-
-      {/* Standalone chat — full screen, no sidebar/header, shared localStorage auth */}
-      <Route element={<RequireChat />}>
-        <Route path="/chat" element={<Chat />} />
-        <Route path="/chat/:channelId" element={<Chat />} />
-      </Route>
 
       <Route element={<RequireAuth />}>
         <Route path="/" element={<Dashboard />} />

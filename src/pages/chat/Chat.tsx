@@ -701,7 +701,7 @@ const CreateChannelModal: React.FC<{
 
 // ─── Main Chat Page ───────────────────────────────────────────────────────────
 
-export default function Chat() {
+export default function Chat({ standalone = false }: { standalone?: boolean }) {
   const { channelId: urlChannelId } = useParams<{ channelId: string }>();
   const navigate = useNavigate();
   const { currentUser } = useAuth();
@@ -907,7 +907,7 @@ export default function Chat() {
     setEditingMsg(null);
     setSearchResults(null);
     setSearch('');
-    navigate(`/chat/${id}`);
+    if (!standalone) navigate(`/chat/${id}`);
   };
 
   // Group messages by date

@@ -65,7 +65,7 @@ const NavGroup: React.FC<NavGroupProps> = ({ item }) => {
     if (item.newTab) {
       const openChat = () => {
         const base = window.location.origin + '/test-crm';
-        window.open(base + item.path, '_blank', 'noopener,noreferrer');
+        window.open(base + '/?mode=chat', '_blank');
       };
       return (
         <button
