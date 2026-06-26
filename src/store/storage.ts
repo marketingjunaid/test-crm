@@ -4,7 +4,7 @@ import type {
   AttendanceRecord, PayrollRecord, PerformanceReview, HRDocument,
   Invoice, InvoiceItem, Expense, Budget, Project, Task, Timesheet,
   Product, StockMovement, Vendor, PurchaseOrder, Ticket, KBArticle,
-  Asset, Announcement, AppNotification, CalendarEvent
+  Asset, Announcement, AppNotification, CalendarEvent, AuditLog
 } from '../types';
 
 const K = {
@@ -19,6 +19,7 @@ const K = {
   tickets: 'orgos_tickets', kb: 'orgos_kb', assets: 'orgos_assets',
   announcements: 'orgos_announcements', notifications: 'orgos_notifications',
   calendarEvents: 'orgos_calendar_events',
+  auditLog: 'orgos_audit_log',
   initialized: 'orgos_initialized',
 };
 
@@ -388,3 +389,6 @@ export function initializeData() {
 
   localStorage.setItem(K.initialized, 'true');
 }
+
+export const getAuditLog = () => get<AuditLog>(K.auditLog);
+export const saveAuditLog = (d: AuditLog[]) => set(K.auditLog, d);

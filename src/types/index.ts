@@ -402,3 +402,14 @@ export interface AppNotification {
   link?: string;
 }
 
+export interface AuditLog {
+  id: string;
+  userId: string;
+  userName: string;
+  action: 'create' | 'update' | 'delete';
+  module: string;
+  entityId: string;
+  description: string;
+  timestamp: string;
+}
+

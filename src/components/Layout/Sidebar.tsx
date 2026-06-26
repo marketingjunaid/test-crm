@@ -23,7 +23,7 @@ const navItems: { section: string; sectionKey: AppSection; items: NavItem[] }[] 
     { label: 'Onboarding', path: '/hr/onboarding' }, { label: 'Leave', path: '/hr/leave' },
     { label: 'Attendance', path: '/hr/attendance' }, { label: 'Payroll', path: '/hr/payroll' },
     { label: 'Performance', path: '/hr/performance' }, { label: 'Documents', path: '/hr/documents' },
-    { label: 'Org Chart', path: '/hr/org-chart' },
+    { label: 'Org Chart', path: '/hr/org-chart' }, { label: 'My Profile', path: '/hr/self-service' },
   ]}]},
   { section: 'FINANCE', sectionKey: 'finance', items: [{ label: 'Finance', icon: <DollarSign size={16} />, children: [
     { label: 'Invoices', path: '/finance/invoices' }, { label: 'Expenses', path: '/finance/expenses' },
@@ -53,7 +53,10 @@ const navItems: { section: string; sectionKey: AppSection; items: NavItem[] }[] 
   { section: 'COMPANY', sectionKey: 'documents', items: [
     { label: 'Documents', path: '/documents', icon: <FileText size={16} /> },
   ]},
-  { section: 'ADMIN', sectionKey: 'settings', items: [{ label: 'Settings', path: '/settings', icon: <Settings size={16} /> }] },
+  { section: 'ADMIN', sectionKey: 'settings', items: [
+    { label: 'Settings', path: '/settings', icon: <Settings size={16} /> },
+    { label: 'Audit Log', path: '/audit-log', icon: <FileText size={16} /> },
+  ]},
 ];
 
 interface NavGroupProps { item: NavItem; }
