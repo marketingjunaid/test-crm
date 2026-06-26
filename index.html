@@ -11,10 +11,10 @@
         var l = window.location;
         if (l.search[1] === 'p') {
           var params = l.search.slice(1).split('&');
-          var path = params[0].slice(2);
+          var path = params[0].slice(2); // "/chat" (already has leading slash)
           var query = params[1] ? '?' + decodeURIComponent(params[1].slice(2)) : '';
           var hash = l.hash;
-          history.replaceState(null, null, l.pathname.slice(0, -1) + (path ? '/' + path : '') + query + hash);
+          history.replaceState(null, null, l.pathname.slice(0, -1) + path + query + hash);
         }
       })();
     </script>
