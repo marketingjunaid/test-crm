@@ -63,17 +63,19 @@ const NavGroup: React.FC<NavGroupProps> = ({ item }) => {
 
   if (item.path) {
     if (item.newTab) {
+      const openChat = () => {
+        const base = window.location.origin + '/test-crm';
+        window.open(base + item.path, '_blank', 'noopener,noreferrer');
+      };
       return (
-        <a
-          href={`/test-crm${item.path}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all text-slate-400 hover:text-white hover:bg-slate-800"
+        <button
+          onClick={openChat}
+          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all text-slate-400 hover:text-white hover:bg-slate-800"
         >
           {item.icon}
           <span>{item.label}</span>
           <svg className="ml-auto opacity-40" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 9L9 1M9 1H3M9 1V7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-        </a>
+        </button>
       );
     }
     return (
