@@ -7,7 +7,8 @@ import Badge from '../../components/UI/Badge';
 import Modal from '../../components/UI/Modal';
 import Input from '../../components/UI/Input';
 import Select from '../../components/UI/Select';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Download, FileText } from 'lucide-react';
+import { downloadCSV, printTable } from '../../utils/export';
 
 export default function Attendance() {
   const [records, setRecords] = useState<AttendanceRecord[]>(getAttendance());
@@ -39,7 +40,21 @@ export default function Attendance() {
 
   return (
     <div>
-      <PageHeader title="Attendance" subtitle="Track employee attendance records" action={<Button onClick={() => setShowModal(true)}><Plus size={16} className="mr-1" />Log Attendance</Button>} />
+      <PageHeader title="Attendance" subtitle="Track employee attendance records" action={
+        <div className="flex gap-2">
+          <Button variant="secondary" onClick={() => {
+            const hdrs = ['Employee', 'Date', 'Status'];
+            const rows = filtered.map(r => [empName(r.employeeId), r.date, r.status]);
+            downloadCSV(`attendance-${filterDate || 'all'}.csv`, hdrs, rows);
+          }}><Download size={14} /> CSV</Button>
+          <Button variant="secondary" onClick={() => {
+            const hdrs = ['Employee', 'Date', 'Status'];
+            const rows = filtered.map(r => [empName(r.employeeId), r.date, r.status]);
+            printTable(`Attendance Report${filterDate ? ` — ${filterDate}` : ''}`, hdrs, rows);
+          }}><FileText size={14} /> PDF</Button>
+          <Button onClick={() => setShowModal(true)}><Plus size={16} className="mr-1" />Log Attendance</Button>
+        </div>
+      } />
 
       <div className="flex gap-3 mb-6 flex-wrap">
         <select value={filterEmp} onChange={e => setFilterEmp(e.target.value)} className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">

@@ -9,7 +9,8 @@ import Input from '../../components/UI/Input';
 import Select from '../../components/UI/Select';
 import Textarea from '../../components/UI/Textarea';
 import EmptyState from '../../components/UI/EmptyState';
-import { Plus, Trash2, Edit2, PlusCircle, MinusCircle } from 'lucide-react';
+import { Plus, Trash2, Edit2, PlusCircle, MinusCircle, Download, FileText } from 'lucide-react';
+import { downloadCSV, printTable } from '../../utils/export';
 
 export default function Invoices() {
   const [invoices, setInvoices] = useState<Invoice[]>(getInvoices());
@@ -56,7 +57,21 @@ export default function Invoices() {
 
   return (
     <div>
-      <PageHeader title="Invoices" subtitle="Create and manage client invoices" action={<Button onClick={() => openModal()}><Plus size={16} className="mr-1" />New Invoice</Button>} />
+      <PageHeader title="Invoices" subtitle="Create and manage client invoices" action={
+        <div className="flex gap-2">
+          <Button variant="secondary" onClick={() => {
+            const hdrs = ['Invoice #', 'Client', 'Issue Date', 'Due Date', 'Total', 'Status'];
+            const rows = filtered.map(i => [i.invoiceNumber, i.clientName, i.issueDate, i.dueDate, i.total, i.status]);
+            downloadCSV(`invoices-${filter}.csv`, hdrs, rows);
+          }}><Download size={14} /> CSV</Button>
+          <Button variant="secondary" onClick={() => {
+            const hdrs = ['Invoice #', 'Client', 'Issue Date', 'Due Date', 'Total', 'Status'];
+            const rows = filtered.map(i => [i.invoiceNumber, i.clientName, i.issueDate, i.dueDate, `$${i.total.toLocaleString()}`, i.status]);
+            printTable('Invoices Report', hdrs, rows);
+          }}><FileText size={14} /> PDF</Button>
+          <Button onClick={() => openModal()}><Plus size={16} className="mr-1" />New Invoice</Button>
+        </div>
+      } />
 
       <div className="flex gap-2 mb-6">
         {tabs.map(t => <button key={t} onClick={() => setFilter(t)} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === t ? 'bg-indigo-600 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:border-indigo-300'}`}>{t === 'all' ? 'All' : t}</button>)}

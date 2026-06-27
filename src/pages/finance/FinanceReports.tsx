@@ -1,6 +1,9 @@
 import { getInvoices, getExpenses, getBudgets } from '../../store/storage';
 import PageHeader from '../../components/UI/PageHeader';
+import { Button } from '../../components/UI/Button';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Download, FileText } from 'lucide-react';
+import { downloadCSV, printTable } from '../../utils/export';
 
 const COLORS = ['#6366F1', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
 
@@ -34,9 +37,30 @@ export default function FinanceReports() {
     { label: 'Outstanding', value: `$${outstanding.toLocaleString()}`, color: 'text-amber-600', bg: 'bg-amber-50' },
   ];
 
+  const exportCSV = () => {
+    const headers = ['Invoice #', 'Client', 'Status', 'Amount', 'Due Date'];
+    const rows = invoices.map(i => [i.invoiceNumber, i.clientName, i.status, `$${i.total}`, i.dueDate]);
+    downloadCSV('finance-report.csv', headers, rows);
+  };
+
+  const exportPDF = () => {
+    const headers = ['Invoice #', 'Client', 'Status', 'Amount', 'Due Date'];
+    const rows = invoices.map(i => [i.invoiceNumber, i.clientName, i.status, `$${i.total.toLocaleString()}`, i.dueDate]);
+    printTable('Finance Report — Invoices', headers, rows);
+  };
+
   return (
     <div>
-      <PageHeader title="Finance Reports" subtitle="Financial overview and analytics" />
+      <PageHeader
+        title="Finance Reports"
+        subtitle="Financial overview and analytics"
+        action={
+          <div className="flex gap-2">
+            <Button variant="secondary" onClick={exportCSV}><Download size={14} /> Export CSV</Button>
+            <Button variant="secondary" onClick={exportPDF}><FileText size={14} /> Print / PDF</Button>
+          </div>
+        }
+      />
       <div className="grid grid-cols-4 gap-4 mb-8">
         {stats.map(s => (
           <div key={s.label} className={`${s.bg} rounded-xl border border-slate-200 p-5`}>

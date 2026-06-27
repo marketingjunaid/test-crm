@@ -269,6 +269,7 @@ export interface Task {
   status: 'To Do' | 'In Progress' | 'Review' | 'Done';
   dueDate: string;
   createdAt: string;
+  dependsOn?: string[];
 }
 
 export interface Timesheet {
@@ -399,5 +400,17 @@ export interface AppNotification {
   type: 'info' | 'success' | 'warning' | 'error';
   read: boolean;
   createdAt: string;
+  link?: string;
+}
+
+export interface AuditLog {
+  id: string;
+  userId: string;
+  userName: string;
+  action: 'create' | 'update' | 'delete';
+  module: string;
+  entityId: string;
+  description: string;
+  timestamp: string;
 }
 

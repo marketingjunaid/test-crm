@@ -7,7 +7,8 @@ import Badge from '../../components/UI/Badge';
 import Modal from '../../components/UI/Modal';
 import Input from '../../components/UI/Input';
 import Select from '../../components/UI/Select';
-import { Plus, DollarSign, Trash2, Edit2 } from 'lucide-react';
+import { Plus, DollarSign, Trash2, Edit2, Download, FileText } from 'lucide-react';
+import { downloadCSV, printTable } from '../../utils/export';
 
 export default function Payroll() {
   const [records, setRecords] = useState<PayrollRecord[]>(getPayroll());
@@ -43,7 +44,21 @@ export default function Payroll() {
 
   return (
     <div>
-      <PageHeader title="Payroll" subtitle="Manage employee salaries and payments" action={<Button onClick={() => openModal()}><Plus size={16} className="mr-1" />Add Record</Button>} />
+      <PageHeader title="Payroll" subtitle="Manage employee salaries and payments" action={
+        <div className="flex gap-2">
+          <Button variant="secondary" onClick={() => {
+            const hdrs = ['Employee','Month','Basic','Allowances','Deductions','Net Salary','Status'];
+            const rows = filtered.map(r => [r.employeeName, r.month, r.basicSalary, r.allowances, r.deductions, r.netSalary, r.status]);
+            downloadCSV(`payroll-${filterMonth}.csv`, hdrs, rows);
+          }}><Download size={14} /> CSV</Button>
+          <Button variant="secondary" onClick={() => {
+            const hdrs = ['Employee','Month','Basic','Allowances','Deductions','Net Salary','Status'];
+            const rows = filtered.map(r => [r.employeeName, r.month, `$${r.basicSalary.toLocaleString()}`, `$${r.allowances.toLocaleString()}`, `$${r.deductions.toLocaleString()}`, `$${r.netSalary.toLocaleString()}`, r.status]);
+            printTable(`Payroll Report — ${filterMonth}`, hdrs, rows);
+          }}><FileText size={14} /> PDF</Button>
+          <Button onClick={() => openModal()}><Plus size={16} />Add Record</Button>
+        </div>
+      } />
 
       <div className="flex items-center gap-4 mb-6">
         <input type="month" value={filterMonth} onChange={e => setFilterMonth(e.target.value)} className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500" />
