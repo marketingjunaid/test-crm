@@ -26,6 +26,7 @@ export interface AppUser {
   status: 'Active' | 'Inactive';
   createdAt: string;
   sectionOverrides?: AppSection[];
+  managerId?: string;
 }
 
 export interface CompanySettings {

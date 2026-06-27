@@ -17,6 +17,7 @@ interface UserForm {
   password: string;
   role: AppUser['role'];
   department: string;
+  managerId: string;
   useCustomAccess: boolean;
   sectionOverrides: AppSection[];
 }
@@ -30,7 +31,7 @@ export default function Settings() {
   const [showUserModal, setShowUserModal] = useState(false);
   const [editUser, setEditUser] = useState<AppUser | null>(null);
   const [userForm, setUserForm] = useState<UserForm>({
-    name: '', email: '', password: '', role: 'Employee', department: '',
+    name: '', email: '', password: '', role: 'Employee', department: '', managerId: '',
     useCustomAccess: false, sectionOverrides: [],
   });
 
@@ -66,13 +67,13 @@ export default function Settings() {
       setEditUser(u);
       setUserForm({
         name: u.name, email: u.email, password: u.password,
-        role: u.role, department: u.department || '',
+        role: u.role, department: u.department || '', managerId: u.managerId || '',
         useCustomAccess: !!u.sectionOverrides,
         sectionOverrides: u.sectionOverrides ?? ROLE_DEFAULTS[u.role],
       });
     } else {
       setEditUser(null);
-      setUserForm({ name: '', email: '', password: '', role: 'Employee', department: '', useCustomAccess: false, sectionOverrides: [] });
+      setUserForm({ name: '', email: '', password: '', role: 'Employee', department: '', managerId: '', useCustomAccess: false, sectionOverrides: [] });
     }
     setShowUserModal(true);
   };
@@ -99,13 +100,14 @@ export default function Settings() {
     let updated: AppUser[];
     if (editUser) {
       updated = users.map(u => u.id === editUser.id
-        ? { ...u, name: userForm.name, email: userForm.email, password: userForm.password, role: userForm.role, department: userForm.department, sectionOverrides: overrides }
+        ? { ...u, name: userForm.name, email: userForm.email, password: userForm.password, role: userForm.role, department: userForm.department, managerId: userForm.managerId || undefined, sectionOverrides: overrides }
         : u
       );
     } else {
       updated = [...users, {
         id: crypto.randomUUID(), name: userForm.name, email: userForm.email,
         password: userForm.password, role: userForm.role, department: userForm.department,
+        managerId: userForm.managerId || undefined,
         status: 'Active' as const, createdAt: new Date().toISOString().split('T')[0],
         sectionOverrides: overrides,
       }];
@@ -283,6 +285,15 @@ export default function Settings() {
             options={availableRoles().map(r => ({ value: r, label: r }))}
           />
           <Input label="Department" value={userForm.department} onChange={e => setUserForm(p => ({ ...p, department: e.target.value }))} />
+          <Select
+            label="Reports To (Manager / Team Lead)"
+            value={userForm.managerId}
+            onChange={e => setUserForm(p => ({ ...p, managerId: e.target.value }))}
+            options={[
+              { value: '', label: '— Direct to HR (no manager) —' },
+              ...users.filter(u => u.id !== editUser?.id && (u.role === 'Manager' || u.role === 'Admin' || u.role === 'Super Admin')).map(u => ({ value: u.id, label: `${u.name} — ${u.role}` })),
+            ]}
+          />
 
           <div className="pt-2 border-t border-slate-100">
             <label className="flex items-center gap-2 cursor-pointer mb-3">

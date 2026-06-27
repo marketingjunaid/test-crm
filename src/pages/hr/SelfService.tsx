@@ -46,7 +46,7 @@ export default function SelfService() {
   const submitLeave = () => {
     if (!currentUser) return;
     const days = calcDays(leaveForm.fromDate, leaveForm.toDate);
-    const initialStatus: LeaveApplication['status'] = myEmployee?.managerId ? 'Pending Manager' : 'Pending HR';
+    const initialStatus: LeaveApplication['status'] = (currentUser?.managerId || myEmployee?.managerId) ? 'Pending Manager' : 'Pending HR';
     const newLeave: LeaveApplication = {
       id: crypto.randomUUID(),
       employeeId: currentUser.id,
