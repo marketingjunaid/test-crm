@@ -95,6 +95,9 @@ function AppRoutes() {
           <Route path="/hr/payroll" element={<Payroll />} />
           <Route path="/hr/performance" element={<Performance />} />
           <Route path="/hr/documents" element={<HRDocuments />} />
+        </Route>
+
+        <Route element={<ProtectedSection section="selfservice" />}>
           <Route path="/hr/org-chart" element={<OrgChart />} />
           <Route path="/hr/self-service" element={<SelfService />} />
         </Route>

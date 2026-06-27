@@ -25,6 +25,9 @@ const navItems: { section: string; sectionKey: AppSection; items: NavItem[] }[] 
     { label: 'Performance', path: '/hr/performance' }, { label: 'Documents', path: '/hr/documents' },
     { label: 'Org Chart', path: '/hr/org-chart' }, { label: 'My Profile', path: '/hr/self-service' },
   ]}]},
+  { section: 'HUMAN RESOURCES', sectionKey: 'selfservice', items: [{ label: 'HR', icon: <UserCheck size={16} />, children: [
+    { label: 'Org Chart', path: '/hr/org-chart' }, { label: 'My Profile', path: '/hr/self-service' },
+  ]}]},
   { section: 'FINANCE', sectionKey: 'finance', items: [{ label: 'Finance', icon: <DollarSign size={16} />, children: [
     { label: 'Invoices', path: '/finance/invoices' }, { label: 'Expenses', path: '/finance/expenses' },
     { label: 'Budget', path: '/finance/budget' }, { label: 'Reports', path: '/finance/reports' },
@@ -128,7 +131,10 @@ export const Sidebar: React.FC = () => {
 
       {/* Nav */}
       <div className="flex-1 overflow-y-auto py-4 px-3 sidebar-scroll">
-        {navItems.filter(({ sectionKey }) => canAccess(sectionKey)).map(({ section, sectionKey, items }) => (
+        {navItems.filter(({ sectionKey }) => {
+          if (sectionKey === 'selfservice' && canAccess('hr')) return false;
+          return canAccess(sectionKey);
+        }).map(({ section, sectionKey, items }) => (
           <div key={sectionKey} className="mb-5">
             <p className="text-[10px] font-semibold text-slate-600 uppercase tracking-widest px-3 mb-2">{section}</p>
             <div className="flex flex-col gap-0.5">
