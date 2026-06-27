@@ -2,6 +2,7 @@ import React from 'react';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { Outlet } from 'react-router-dom';
+import OnboardingTour from '../UI/OnboardingTour';
 
 export const Layout: React.FC = () => (
   <div className="flex h-screen bg-slate-50">
@@ -12,5 +13,6 @@ export const Layout: React.FC = () => (
         <Outlet />
       </main>
     </div>
+    <OnboardingTour />
   </div>
 );

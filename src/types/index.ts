@@ -269,6 +269,7 @@ export interface Task {
   status: 'To Do' | 'In Progress' | 'Review' | 'Done';
   dueDate: string;
   createdAt: string;
+  dependsOn?: string[];
 }
 
 export interface Timesheet {
