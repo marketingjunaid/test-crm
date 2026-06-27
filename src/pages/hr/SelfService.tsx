@@ -1,10 +1,16 @@
 import { useState } from 'react';
-import { getEmployees, getLeaves, getAttendance, getPayroll } from '../../store/storage';
+import { getEmployees, getLeaves, saveLeaves, getAttendance, getPayroll, getCompany } from '../../store/storage';
 import { useAuth } from '../../contexts/AuthContext';
 import PageHeader from '../../components/UI/PageHeader';
 import Badge from '../../components/UI/Badge';
-import { User, Calendar, Clock, DollarSign, FileText } from 'lucide-react';
+import { Modal } from '../../components/UI/Modal';
+import { Button } from '../../components/UI/Button';
+import { Input } from '../../components/UI/Input';
+import { Select } from '../../components/UI/Select';
+import { Textarea } from '../../components/UI/Textarea';
+import { User, Calendar, Clock, DollarSign, FileText, Plus } from 'lucide-react';
 import { printTable } from '../../utils/export';
+import type { LeaveApplication } from '../../types';
 
 const fmt = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
 
@@ -18,15 +24,46 @@ const TABS = [
 export default function SelfService() {
   const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState('profile');
+  const [leaveModal, setLeaveModal] = useState(false);
+  const [leaveForm, setLeaveForm] = useState({ type: 'Annual' as LeaveApplication['type'], fromDate: '', toDate: '', reason: '' });
 
   const employees = getEmployees();
   const myEmployee = employees.find(e => e.name === currentUser?.name);
-  const leaves = getLeaves().filter(l => l.employeeId === currentUser?.id || l.employeeName === currentUser?.name);
+  const [allLeaves, setAllLeaves] = useState(getLeaves());
+  const leaves = allLeaves.filter(l => l.employeeId === currentUser?.id || l.employeeName === currentUser?.name);
   const attendance = getAttendance().filter(a => a.employeeId === currentUser?.id || a.employeeName === currentUser?.name);
   const payroll = getPayroll().filter(p => p.employeeId === currentUser?.id || p.employeeName === currentUser?.name);
+  const { annualLeaves } = getCompany();
 
   const approvedDays = leaves.filter(l => l.status === 'Approved').reduce((s, l) => s + l.days, 0);
-  const leaveBalance = Math.max(0, 20 - approvedDays);
+  const leaveBalance = Math.max(0, annualLeaves - approvedDays);
+
+  const calcDays = (from: string, to: string) => {
+    if (!from || !to) return 0;
+    return Math.max(1, Math.floor((new Date(to).getTime() - new Date(from).getTime()) / 86400000) + 1);
+  };
+
+  const submitLeave = () => {
+    if (!currentUser) return;
+    const days = calcDays(leaveForm.fromDate, leaveForm.toDate);
+    const newLeave: LeaveApplication = {
+      id: crypto.randomUUID(),
+      employeeId: currentUser.id,
+      employeeName: currentUser.name,
+      type: leaveForm.type,
+      fromDate: leaveForm.fromDate,
+      toDate: leaveForm.toDate,
+      days,
+      reason: leaveForm.reason,
+      status: 'Pending',
+      appliedAt: new Date().toISOString().split('T')[0],
+    };
+    const updated = [...allLeaves, newLeave];
+    saveLeaves(updated);
+    setAllLeaves(updated);
+    setLeaveModal(false);
+    setLeaveForm({ type: 'Annual', fromDate: '', toDate: '', reason: '' });
+  };
 
   const thisMonth = new Date().toISOString().slice(0, 7);
   const thisMonthAttendance = attendance.filter(a => a.date.startsWith(thisMonth));
@@ -107,8 +144,9 @@ export default function SelfService() {
             <div className="flex gap-6 text-sm">
               <span className="text-slate-500">Balance: <strong className="text-emerald-600">{leaveBalance} days</strong></span>
               <span className="text-slate-500">Used: <strong className="text-rose-600">{approvedDays} days</strong></span>
-              <span className="text-slate-500">Total: <strong className="text-slate-900">20 days</strong></span>
+              <span className="text-slate-500">Total: <strong className="text-slate-900">{annualLeaves} days</strong></span>
             </div>
+            <Button onClick={() => setLeaveModal(true)}><Plus size={14} /> Apply Leave</Button>
           </div>
           {leaves.length === 0 ? (
             <div className="p-12 text-center text-slate-400">No leave records found</div>
@@ -222,6 +260,27 @@ export default function SelfService() {
           )}
         </div>
       )}
+
+      <Modal isOpen={leaveModal} onClose={() => setLeaveModal(false)} title="Apply for Leave">
+        <div className="flex flex-col gap-4">
+          <div className="text-sm text-slate-500 bg-slate-50 rounded-lg px-3 py-2">
+            Applying as: <strong className="text-slate-900">{currentUser?.name}</strong>
+          </div>
+          <Select label="Leave Type" value={leaveForm.type} onChange={e => setLeaveForm({ ...leaveForm, type: e.target.value as LeaveApplication['type'] })} options={['Annual', 'Sick', 'Emergency', 'Unpaid'].map(v => ({ value: v, label: v }))} />
+          <div className="grid grid-cols-2 gap-4">
+            <Input label="From Date" type="date" value={leaveForm.fromDate} onChange={e => setLeaveForm({ ...leaveForm, fromDate: e.target.value })} />
+            <Input label="To Date" type="date" value={leaveForm.toDate} onChange={e => setLeaveForm({ ...leaveForm, toDate: e.target.value })} />
+          </div>
+          {leaveForm.fromDate && leaveForm.toDate && (
+            <p className="text-xs text-indigo-600 font-medium">{calcDays(leaveForm.fromDate, leaveForm.toDate)} day(s)</p>
+          )}
+          <Textarea label="Reason" value={leaveForm.reason} onChange={e => setLeaveForm({ ...leaveForm, reason: e.target.value })} placeholder="Reason for leave..." />
+        </div>
+        <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-slate-100">
+          <Button variant="secondary" onClick={() => setLeaveModal(false)}>Cancel</Button>
+          <Button onClick={submitLeave} disabled={!leaveForm.fromDate || !leaveForm.toDate || !leaveForm.reason}>Submit Application</Button>
+        </div>
+      </Modal>
     </div>
   );
 }
