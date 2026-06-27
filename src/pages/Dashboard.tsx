@@ -38,7 +38,7 @@ function AdminDashboard() {
   const activeDeals = deals.filter(d => !['Won', 'Lost'].includes(d.stage)).length;
   const openTickets = tickets.filter(t => !['Resolved', 'Closed'].includes(t.status)).length;
   const pendingTasks = tasks.filter(t => t.status !== 'Done').length;
-  const pendingLeaves = leaves.filter(l => l.status === 'Pending').length;
+  const pendingLeaves = leaves.filter(l => l.status === 'Pending Manager' || l.status === 'Pending HR').length;
 
   return (
     <div>
@@ -160,7 +160,7 @@ function ManagerDashboard({ department }: { department: string }) {
   const openTickets = tickets.filter(t => !['Resolved', 'Closed'].includes(t.status)).length;
 
   const teamLeaves = leaves.filter(l => teamNames.includes(l.employeeName));
-  const pendingLeaves = teamLeaves.filter(l => l.status === 'Pending');
+  const pendingLeaves = teamLeaves.filter(l => l.status === 'Pending Manager' || l.status === 'Pending HR');
 
   const taskChartData = [
     { status: 'To Do', count: teamTasks.filter(t => t.status === 'To Do').length },

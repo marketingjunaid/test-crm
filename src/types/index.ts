@@ -106,6 +106,7 @@ export interface Employee {
   joinDate: string;
   status: 'Active' | 'Inactive';
   contractType: 'Full-time' | 'Part-time' | 'Contract';
+  managerId?: string;
   createdAt: string;
 }
 
@@ -149,7 +150,7 @@ export interface LeaveApplication {
   toDate: string;
   days: number;
   reason: string;
-  status: 'Pending' | 'Approved' | 'Rejected';
+  status: 'Pending Manager' | 'Pending HR' | 'Approved' | 'Rejected';
   appliedAt: string;
 }
 

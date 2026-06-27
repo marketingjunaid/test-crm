@@ -10,7 +10,7 @@ import { EmptyState } from '../../components/UI/EmptyState';
 import { getEmployees, saveEmployees, getDepartments } from '../../store/storage';
 import type { Employee } from '../../types';
 
-const empty: Omit<Employee,'id'|'createdAt'> = { name:'',email:'',phone:'',role:'',department:'',salary:0,joinDate:'',status:'Active',contractType:'Full-time' };
+const empty: Omit<Employee,'id'|'createdAt'> = { name:'',email:'',phone:'',role:'',department:'',salary:0,joinDate:'',status:'Active',contractType:'Full-time',managerId:'' };
 
 export default function Employees() {
   const [employees, setEmployees] = useState(getEmployees());
@@ -26,7 +26,7 @@ export default function Employees() {
     saveEmployees(updated); setEmployees(updated); setModal(false); setEditing(null); setForm(empty);
   };
   const del = (id:string) => { if(!confirm('Delete employee?'))return; const u=employees.filter(e=>e.id!==id); saveEmployees(u); setEmployees(u); };
-  const openEdit = (e:Employee) => { setEditing(e); setForm({name:e.name,email:e.email,phone:e.phone,role:e.role,department:e.department,salary:e.salary,joinDate:e.joinDate,status:e.status,contractType:e.contractType}); setModal(true); };
+  const openEdit = (e:Employee) => { setEditing(e); setForm({name:e.name,email:e.email,phone:e.phone,role:e.role,department:e.department,salary:e.salary,joinDate:e.joinDate,status:e.status,contractType:e.contractType,managerId:e.managerId||''}); setModal(true); };
   const filtered = employees.filter(e=>(deptFilter==='All'||e.department===deptFilter)&&(e.name.toLowerCase().includes(search.toLowerCase())||e.role.toLowerCase().includes(search.toLowerCase())));
   const fmt = (n:number) => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n);
 
@@ -42,12 +42,15 @@ export default function Employees() {
         </div>
         {filtered.length===0?<EmptyState message="No employees found"/>:(
           <table className="w-full">
-            <thead><tr className="border-b border-slate-100">{['Employee','Department','Role','Salary','Contract','Status','Joined',''].map(h=><th key={h} className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">{h}</th>)}</tr></thead>
-            <tbody>{filtered.map(e=>(
+            <thead><tr className="border-b border-slate-100">{['Employee','Department','Role','Reports To','Salary','Contract','Status','Joined',''].map(h=><th key={h} className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">{h}</th>)}</tr></thead>
+            <tbody>{filtered.map(e=>{
+              const manager = e.managerId ? employees.find(m=>m.id===e.managerId) : null;
+              return (
               <tr key={e.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
                 <td className="px-5 py-3.5"><div className="flex items-center gap-2.5"><div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 text-sm font-bold">{e.name[0]}</div><div><p className="text-sm font-medium text-slate-900">{e.name}</p><p className="text-xs text-slate-400">{e.email}</p></div></div></td>
                 <td className="px-5 py-3.5 text-sm text-slate-600">{e.department}</td>
                 <td className="px-5 py-3.5 text-sm text-slate-600">{e.role}</td>
+                <td className="px-5 py-3.5 text-sm text-slate-600">{manager ? <span className="flex items-center gap-1"><span className="w-5 h-5 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 text-xs font-bold">{manager.name[0]}</span>{manager.name}</span> : <span className="text-slate-400 text-xs">Direct to HR</span>}</td>
                 <td className="px-5 py-3.5 text-sm text-slate-700 font-medium">{fmt(e.salary)}</td>
                 <td className="px-5 py-3.5"><Badge label={e.contractType}/></td>
                 <td className="px-5 py-3.5"><Badge label={e.status}/></td>
@@ -57,7 +60,7 @@ export default function Employees() {
                   <button onClick={()=>del(e.id)} className="p-1.5 hover:bg-rose-50 rounded-lg text-slate-400 hover:text-rose-600"><Trash2 size={14}/></button>
                 </div></td>
               </tr>
-            ))}</tbody>
+            )})}</tbody>
           </table>
         )}
       </div>
@@ -72,6 +75,7 @@ export default function Employees() {
           <Input label="Join Date" type="date" value={form.joinDate} onChange={e=>setForm({...form,joinDate:e.target.value})} />
           <Select label="Contract Type" value={form.contractType} onChange={e=>setForm({...form,contractType:e.target.value as Employee['contractType']})} options={['Full-time','Part-time','Contract'].map(v=>({value:v,label:v}))} />
           <Select label="Status" value={form.status} onChange={e=>setForm({...form,status:e.target.value as Employee['status']})} options={['Active','Inactive'].map(v=>({value:v,label:v}))} />
+          <Select label="Reports To (Manager / Team Lead)" value={form.managerId||''} onChange={e=>setForm({...form,managerId:e.target.value})} options={[{value:'',label:'— Direct to HR (no manager) —'},...employees.filter(m=>m.id!==(editing?.id)).map(m=>({value:m.id,label:`${m.name} — ${m.role}`}))]} />
         </div>
         <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-slate-100">
           <Button variant="secondary" onClick={()=>setModal(false)}>Cancel</Button>

@@ -226,7 +226,7 @@ export function initializeData() {
   const leaves: LeaveApplication[] = [
     { id: '1', employeeId: '2', employeeName: 'Sarah Manager', type: 'Annual', fromDate: '2025-01-20', toDate: '2025-01-22', days: 3, reason: 'Family vacation', status: 'Approved', appliedAt: '2025-01-10' },
     { id: '2', employeeId: '3', employeeName: 'John Employee', type: 'Sick', fromDate: '2025-01-15', toDate: '2025-01-15', days: 1, reason: 'Fever', status: 'Approved', appliedAt: '2025-01-15' },
-    { id: '3', employeeId: '4', employeeName: 'Emily Clark', type: 'Annual', fromDate: '2025-02-03', toDate: '2025-02-07', days: 5, reason: 'Holiday trip', status: 'Pending', appliedAt: '2025-01-18' },
+    { id: '3', employeeId: '4', employeeName: 'Emily Clark', type: 'Annual', fromDate: '2025-02-03', toDate: '2025-02-07', days: 5, reason: 'Holiday trip', status: 'Pending HR', appliedAt: '2025-01-18' },
     { id: '4', employeeId: '5', employeeName: 'Michael Brown', type: 'Emergency', fromDate: '2025-01-17', toDate: '2025-01-17', days: 1, reason: 'Family emergency', status: 'Approved', appliedAt: '2025-01-17' },
   ];
   set(K.leaves, leaves);
