@@ -9,6 +9,7 @@ import { Select } from '../../components/UI/Select';
 import { EmptyState } from '../../components/UI/EmptyState';
 import { getEmployees, saveEmployees, getDepartments, getUsers, saveUsers, getCompany } from '../../store/storage';
 import { fireTrigger } from '../../utils/automationEngine';
+import { useAuth } from '../../contexts/AuthContext';
 import type { Employee, AppUser } from '../../types';
 
 const empty: Omit<Employee,'id'|'createdAt'> = {
@@ -36,6 +37,8 @@ export default function Employees() {
   const [emailPreview, setEmailPreview] = useState(false);
   const [provisionedUser, setProvisionedUser] = useState<AppUser|null>(null);
 
+  const { currentUser } = useAuth();
+  const canGrantAccess = currentUser?.role === 'Admin' || currentUser?.role === 'Super Admin';
   const depts = ['All', ...getDepartments().map(d=>d.name)];
 
   const save = () => {
@@ -158,7 +161,7 @@ export default function Employees() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-slate-100">
-                {['Employee','Department','Role','Reports To','Salary','Contract','Status','Joined','Access',''].map(h => (
+                {['Employee','Department','Role','Reports To','Salary','Contract','Status','Joined',...(canGrantAccess?['Access']:[]),''].map(h => (
                   <th key={h} className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">{h}</th>
                 ))}
               </tr>
@@ -189,14 +192,16 @@ export default function Employees() {
                     <td className="px-5 py-3.5"><Badge label={e.contractType}/></td>
                     <td className="px-5 py-3.5"><Badge label={e.status}/></td>
                     <td className="px-5 py-3.5 text-xs text-slate-400">{e.joinDate}</td>
-                    <td className="px-5 py-3.5">
-                      {hasAccess
-                        ? <span className="inline-flex items-center gap-1 text-xs text-emerald-600 font-medium"><ShieldCheck size={13}/>Active</span>
-                        : <button onClick={() => openGrant(e)} className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-amber-50 text-amber-700 rounded-lg hover:bg-amber-100 transition-colors font-medium">
-                            <ShieldCheck size={12}/>Grant Access
-                          </button>
-                      }
-                    </td>
+                    {canGrantAccess && (
+                      <td className="px-5 py-3.5">
+                        {hasAccess
+                          ? <span className="inline-flex items-center gap-1 text-xs text-emerald-600 font-medium"><ShieldCheck size={13}/>Active</span>
+                          : <button onClick={() => openGrant(e)} className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-amber-50 text-amber-700 rounded-lg hover:bg-amber-100 transition-colors font-medium">
+                              <ShieldCheck size={12}/>Grant Access
+                            </button>
+                        }
+                      </td>
+                    )}
                     <td className="px-5 py-3.5">
                       <div className="flex gap-1">
                         <button onClick={() => openEdit(e)} className="p-1.5 hover:bg-indigo-50 rounded-lg text-slate-400 hover:text-indigo-600"><Pencil size={14}/></button>
