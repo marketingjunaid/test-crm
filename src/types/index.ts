@@ -28,6 +28,9 @@ export interface AppUser {
   createdAt: string;
   sectionOverrides?: AppSection[];
   managerId?: string;
+  linkedEmployeeId?: string;
+  mustChangePassword?: boolean;
+  hasLoggedIn?: boolean;
 }
 
 export interface CompanySettings {
@@ -109,6 +112,12 @@ export interface Employee {
   status: 'Active' | 'Inactive';
   contractType: 'Full-time' | 'Part-time' | 'Contract';
   managerId?: string;
+  linkedUserId?: string;
+  address?: string;
+  emergencyContact?: string;
+  emergencyPhone?: string;
+  dateOfBirth?: string;
+  nationality?: string;
   createdAt: string;
 }
 
