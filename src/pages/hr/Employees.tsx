@@ -8,6 +8,7 @@ import { Input } from '../../components/UI/Input';
 import { Select } from '../../components/UI/Select';
 import { EmptyState } from '../../components/UI/EmptyState';
 import { getEmployees, saveEmployees, getDepartments } from '../../store/storage';
+import { fireTrigger } from '../../utils/automationEngine';
 import type { Employee } from '../../types';
 
 const empty: Omit<Employee,'id'|'createdAt'> = { name:'',email:'',phone:'',role:'',department:'',salary:0,joinDate:'',status:'Active',contractType:'Full-time',managerId:'' };
@@ -22,8 +23,10 @@ export default function Employees() {
   const depts = ['All', ...getDepartments().map(d=>d.name)];
 
   const save = () => {
+    const isNew = !editing;
     const updated = editing ? employees.map(e=>e.id===editing.id?{...editing,...form}:e) : [...employees,{...form,id:crypto.randomUUID(),createdAt:new Date().toISOString().split('T')[0]}];
     saveEmployees(updated); setEmployees(updated); setModal(false); setEditing(null); setForm(empty);
+    if (isNew) fireTrigger('employee_added', { name: form.name, department: form.department });
   };
   const del = (id:string) => { if(!confirm('Delete employee?'))return; const u=employees.filter(e=>e.id!==id); saveEmployees(u); setEmployees(u); };
   const openEdit = (e:Employee) => { setEditing(e); setForm({name:e.name,email:e.email,phone:e.phone,role:e.role,department:e.department,salary:e.salary,joinDate:e.joinDate,status:e.status,contractType:e.contractType,managerId:e.managerId||''}); setModal(true); };

@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Users, UserCheck, DollarSign, Briefcase, Package,
   Headphones, Monitor, Bell, Settings, ChevronDown, ChevronRight,
   TrendingUp, FileText, Building2, MessageSquare, CalendarDays,
-  BarChart2, Radio
+  BarChart2, Radio, Zap
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import type { AppSection } from '../../types';
@@ -59,6 +59,9 @@ const navItems: { section: string; sectionKey: AppSection; items: NavItem[] }[] 
   ]},
   { section: 'INSIGHTS', sectionKey: 'analytics', items: [
     { label: 'Analytics', path: '/analytics', icon: <BarChart2 size={16} /> },
+  ]},
+  { section: 'INSIGHTS', sectionKey: 'automation', items: [
+    { label: 'Automation', path: '/automation', icon: <Zap size={16} /> },
   ]},
   { section: 'COMMUNICATE', sectionKey: 'communication', items: [
     { label: 'Communication', icon: <Radio size={16} />, children: [

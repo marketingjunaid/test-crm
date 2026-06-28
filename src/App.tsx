@@ -43,6 +43,7 @@ import Settings from './pages/settings/Settings';
 import Analytics from './pages/Analytics';
 import Polls from './pages/communication/Polls';
 import Meetings from './pages/communication/Meetings';
+import AutomationPage from './pages/automation/Automation';
 
 function RequireAuth() {
   const { currentUser } = useAuth();
@@ -149,6 +150,10 @@ function AppRoutes() {
         <Route element={<ProtectedSection section="communication" />}>
           <Route path="/communication/polls" element={<Polls />} />
           <Route path="/communication/meetings" element={<Meetings />} />
+        </Route>
+
+        <Route element={<ProtectedSection section="automation" />}>
+          <Route path="/automation" element={<AutomationPage />} />
         </Route>
 
         <Route element={<ProtectedSection section="settings" />}>

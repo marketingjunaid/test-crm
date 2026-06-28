@@ -23,12 +23,13 @@ export const SECTION_LABELS: Record<AppSection, string> = {
   selfservice: 'My Profile & Org Chart',
   analytics: 'Analytics & Reports',
   communication: 'Communication (Polls & Meetings)',
+  automation: 'Automation & Workflows',
 };
 
 export const ROLE_DEFAULTS: Record<AppUser['role'], AppSection[]> = {
   'Super Admin': [...ALL_SECTIONS],
   'Admin': [...ALL_SECTIONS],
-  'Manager': ['dashboard', 'chat', 'calendar', 'crm', 'hr', 'projects', 'inventory', 'support', 'assets', 'announcements', 'documents', 'selfservice', 'analytics', 'communication'],
+  'Manager': ['dashboard', 'chat', 'calendar', 'crm', 'hr', 'projects', 'inventory', 'support', 'assets', 'announcements', 'documents', 'selfservice', 'analytics', 'communication', 'automation'],
   'Employee': ['dashboard', 'chat', 'calendar', 'selfservice', 'announcements', 'documents', 'communication'],
 };
 

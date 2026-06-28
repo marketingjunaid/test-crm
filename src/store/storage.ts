@@ -5,7 +5,7 @@ import type {
   Invoice, InvoiceItem, Expense, Budget, Project, Task, Timesheet,
   Product, StockMovement, Vendor, PurchaseOrder, Ticket, KBArticle,
   Asset, Announcement, AppNotification, CalendarEvent, AuditLog,
-  Poll, Meeting
+  Poll, Meeting, AutomationRule, AutomationLog
 } from '../types';
 
 const K = {
@@ -23,6 +23,8 @@ const K = {
   auditLog: 'orgos_audit_log',
   polls: 'orgos_polls',
   meetings: 'orgos_meetings',
+  automationRules: 'orgos_automation_rules',
+  automationLogs: 'orgos_automation_logs',
   initialized: 'orgos_initialized',
 };
 
@@ -111,6 +113,10 @@ export const getPolls = () => get<Poll>(K.polls);
 export const savePolls = (d: Poll[]) => set(K.polls, d);
 export const getMeetings = () => get<Meeting>(K.meetings);
 export const saveMeetings = (d: Meeting[]) => set(K.meetings, d);
+export const getAutomationRules = () => get<AutomationRule>(K.automationRules);
+export const saveAutomationRules = (d: AutomationRule[]) => set(K.automationRules, d);
+export const getAutomationLogs = () => get<AutomationLog>(K.automationLogs);
+export const saveAutomationLogs = (d: AutomationLog[]) => set(K.automationLogs, d);
 
 export function migrateData() {
   const raw = localStorage.getItem(K.users);
