@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Pencil, Trash2, Search, ShieldCheck, Mail, Eye, EyeOff } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, ShieldCheck, Mail, Eye, EyeOff, Copy, CheckCheck } from 'lucide-react';
 import { PageHeader } from '../../components/UI/PageHeader';
 import { Button } from '../../components/UI/Button';
 import { Modal } from '../../components/UI/Modal';
@@ -9,6 +9,7 @@ import { Select } from '../../components/UI/Select';
 import { EmptyState } from '../../components/UI/EmptyState';
 import { getEmployees, saveEmployees, getDepartments, getUsers, saveUsers, getCompany } from '../../store/storage';
 import { fireTrigger } from '../../utils/automationEngine';
+import { addNotification } from '../../utils/notifications';
 import { useAuth } from '../../contexts/AuthContext';
 import type { Employee, AppUser } from '../../types';
 
@@ -36,6 +37,7 @@ export default function Employees() {
   const [showPass, setShowPass] = useState(false);
   const [emailPreview, setEmailPreview] = useState(false);
   const [provisionedUser, setProvisionedUser] = useState<AppUser|null>(null);
+  const [copied, setCopied] = useState(false);
 
   const { currentUser } = useAuth();
   const canGrantAccess = currentUser?.role === 'Admin' || currentUser?.role === 'Super Admin';
@@ -122,6 +124,13 @@ export default function Employees() {
     setProvisionedUser(newUser);
     setGrantModal(false);
     setEmailPreview(true);
+    setCopied(false);
+    addNotification(
+      'System Access Granted',
+      `Account created for ${grantTarget.name} (${grantTarget.email}) — share the login credentials from the email preview.`,
+      'success',
+      '/hr/employees'
+    );
   };
 
   const filtered = employees.filter(e =>
@@ -319,10 +328,24 @@ export default function Employees() {
       <Modal isOpen={emailPreview} onClose={() => { setEmailPreview(false); setProvisionedUser(null); }} title="Welcome Email Preview" size="lg">
         {provisionedUser && (
           <div>
-            <div className="flex items-center gap-2 mb-4 text-sm text-slate-500">
-              <Mail size={14}/>
-              <span>This email will be sent to <strong>{provisionedUser.email}</strong></span>
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+              <div className="flex items-center gap-2 text-sm text-slate-500">
+                <Mail size={14}/>
+                <span>Simulated email for <strong>{provisionedUser.email}</strong></span>
+              </div>
+              <button
+                onClick={() => {
+                  const text = `Login URL: ${window.location.origin}\nEmail: ${provisionedUser.email}\nPassword: ${provisionedUser.password}\nRole: ${provisionedUser.role}`;
+                  navigator.clipboard.writeText(text).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2500); });
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors font-medium"
+              >
+                {copied ? <><CheckCheck size={12} className="text-emerald-600"/>Copied!</> : <><Copy size={12}/>Copy Credentials</>}
+              </button>
             </div>
+            <p className="text-xs text-amber-600 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 mb-4">
+              No email backend is connected. Copy the credentials above and share them with the employee directly (via email, WhatsApp, etc.).
+            </p>
             <div className="border border-slate-200 rounded-xl overflow-hidden">
               {/* Email header */}
               <div className="bg-indigo-600 px-8 py-6 text-center">
