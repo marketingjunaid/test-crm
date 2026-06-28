@@ -40,6 +40,9 @@ import Assets from './pages/Assets';
 import Announcements from './pages/Announcements';
 import Documents from './pages/Documents';
 import Settings from './pages/settings/Settings';
+import Analytics from './pages/Analytics';
+import Polls from './pages/communication/Polls';
+import Meetings from './pages/communication/Meetings';
 
 function RequireAuth() {
   const { currentUser } = useAuth();
@@ -137,6 +140,15 @@ function AppRoutes() {
 
         <Route element={<ProtectedSection section="documents" />}>
           <Route path="/documents" element={<Documents />} />
+        </Route>
+
+        <Route element={<ProtectedSection section="analytics" />}>
+          <Route path="/analytics" element={<Analytics />} />
+        </Route>
+
+        <Route element={<ProtectedSection section="communication" />}>
+          <Route path="/communication/polls" element={<Polls />} />
+          <Route path="/communication/meetings" element={<Meetings />} />
         </Route>
 
         <Route element={<ProtectedSection section="settings" />}>

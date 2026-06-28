@@ -3,7 +3,8 @@ import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Users, UserCheck, DollarSign, Briefcase, Package,
   Headphones, Monitor, Bell, Settings, ChevronDown, ChevronRight,
-  TrendingUp, FileText, Building2, MessageSquare, CalendarDays
+  TrendingUp, FileText, Building2, MessageSquare, CalendarDays,
+  BarChart2, Radio
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import type { AppSection } from '../../types';
@@ -55,6 +56,15 @@ const navItems: { section: string; sectionKey: AppSection; items: NavItem[] }[] 
   ]},
   { section: 'COMPANY', sectionKey: 'documents', items: [
     { label: 'Documents', path: '/documents', icon: <FileText size={16} /> },
+  ]},
+  { section: 'INSIGHTS', sectionKey: 'analytics', items: [
+    { label: 'Analytics', path: '/analytics', icon: <BarChart2 size={16} /> },
+  ]},
+  { section: 'COMMUNICATE', sectionKey: 'communication', items: [
+    { label: 'Communication', icon: <Radio size={16} />, children: [
+      { label: 'Polls & Surveys', path: '/communication/polls' },
+      { label: 'Meetings', path: '/communication/meetings' },
+    ]},
   ]},
   { section: 'ADMIN', sectionKey: 'settings', items: [
     { label: 'Settings', path: '/settings', icon: <Settings size={16} /> },

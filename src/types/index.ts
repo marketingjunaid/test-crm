@@ -1,7 +1,8 @@
 export type AppSection =
   | 'dashboard' | 'crm' | 'hr' | 'finance' | 'projects'
   | 'inventory' | 'support' | 'assets' | 'announcements'
-  | 'documents' | 'settings' | 'chat' | 'calendar' | 'selfservice';
+  | 'documents' | 'settings' | 'chat' | 'calendar' | 'selfservice'
+  | 'analytics' | 'communication';
 
 export interface CalendarEvent {
   id: string;
@@ -403,6 +404,39 @@ export interface AppNotification {
   read: boolean;
   createdAt: string;
   link?: string;
+}
+
+export interface PollOption {
+  id: string;
+  text: string;
+  votes: string[];
+}
+
+export interface Poll {
+  id: string;
+  question: string;
+  options: PollOption[];
+  createdBy: string;
+  createdAt: string;
+  endsAt?: string;
+  status: 'Active' | 'Closed';
+  allowMultiple: boolean;
+  department: string;
+}
+
+export interface Meeting {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  duration: number;
+  attendees: string[];
+  videoLink?: string;
+  platform: 'Google Meet' | 'Zoom' | 'Teams' | 'Other';
+  createdBy: string;
+  createdAt: string;
+  status: 'Scheduled' | 'Completed' | 'Cancelled';
 }
 
 export interface AuditLog {

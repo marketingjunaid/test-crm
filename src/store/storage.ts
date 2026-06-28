@@ -4,7 +4,8 @@ import type {
   AttendanceRecord, PayrollRecord, PerformanceReview, HRDocument,
   Invoice, InvoiceItem, Expense, Budget, Project, Task, Timesheet,
   Product, StockMovement, Vendor, PurchaseOrder, Ticket, KBArticle,
-  Asset, Announcement, AppNotification, CalendarEvent, AuditLog
+  Asset, Announcement, AppNotification, CalendarEvent, AuditLog,
+  Poll, Meeting
 } from '../types';
 
 const K = {
@@ -20,6 +21,8 @@ const K = {
   announcements: 'orgos_announcements', notifications: 'orgos_notifications',
   calendarEvents: 'orgos_calendar_events',
   auditLog: 'orgos_audit_log',
+  polls: 'orgos_polls',
+  meetings: 'orgos_meetings',
   initialized: 'orgos_initialized',
 };
 
@@ -104,6 +107,10 @@ export const getAnnouncements = () => get<Announcement>(K.announcements);
 export const saveAnnouncements = (d: Announcement[]) => set(K.announcements, d);
 export const getNotifications = () => get<AppNotification>(K.notifications);
 export const saveNotifications = (d: AppNotification[]) => set(K.notifications, d);
+export const getPolls = () => get<Poll>(K.polls);
+export const savePolls = (d: Poll[]) => set(K.polls, d);
+export const getMeetings = () => get<Meeting>(K.meetings);
+export const saveMeetings = (d: Meeting[]) => set(K.meetings, d);
 
 export function migrateData() {
   const raw = localStorage.getItem(K.users);

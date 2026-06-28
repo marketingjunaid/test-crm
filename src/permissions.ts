@@ -2,7 +2,8 @@ import type { AppSection, AppUser } from './types';
 
 export const ALL_SECTIONS: AppSection[] = [
   'dashboard', 'chat', 'calendar', 'crm', 'hr', 'finance', 'projects',
-  'inventory', 'support', 'assets', 'announcements', 'documents', 'settings', 'selfservice',
+  'inventory', 'support', 'assets', 'announcements', 'documents', 'settings',
+  'selfservice', 'analytics', 'communication',
 ];
 
 export const SECTION_LABELS: Record<AppSection, string> = {
@@ -20,14 +21,15 @@ export const SECTION_LABELS: Record<AppSection, string> = {
   documents: 'Documents',
   settings: 'Settings',
   selfservice: 'My Profile & Org Chart',
+  analytics: 'Analytics & Reports',
+  communication: 'Communication (Polls & Meetings)',
 };
 
 export const ROLE_DEFAULTS: Record<AppUser['role'], AppSection[]> = {
   'Super Admin': [...ALL_SECTIONS],
   'Admin': [...ALL_SECTIONS],
-  'Manager': ['dashboard', 'chat', 'calendar', 'crm', 'hr', 'projects', 'inventory', 'support', 'assets', 'announcements', 'documents', 'selfservice'],
-  // Employees do NOT get 'hr' — they only get their own self-service view
-  'Employee': ['dashboard', 'chat', 'calendar', 'selfservice', 'announcements', 'documents'],
+  'Manager': ['dashboard', 'chat', 'calendar', 'crm', 'hr', 'projects', 'inventory', 'support', 'assets', 'announcements', 'documents', 'selfservice', 'analytics', 'communication'],
+  'Employee': ['dashboard', 'chat', 'calendar', 'selfservice', 'announcements', 'documents', 'communication'],
 };
 
 export function resolveAccess(user: AppUser): AppSection[] {
