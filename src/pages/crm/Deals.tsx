@@ -7,6 +7,7 @@ import { Input } from '../../components/UI/Input';
 import { Select } from '../../components/UI/Select';
 import { Textarea } from '../../components/UI/Textarea';
 import { getDeals, saveDeals } from '../../store/storage';
+import { fireTrigger } from '../../utils/automationEngine';
 import type { Deal } from '../../types';
 
 const STAGES: Deal['stage'][] = ['Prospect','Qualified','Proposal','Negotiation','Won','Lost'];
@@ -69,7 +70,13 @@ export default function Deals() {
   const onDrop = (e: React.DragEvent, stage: Deal['stage']) => {
     e.preventDefault();
     if (!dragId || dragStage.current === stage) { setDragId(null); setDragOver(null); return; }
+    const deal = deals.find(d => d.id === dragId);
     persist(deals.map(d => d.id === dragId ? { ...d, stage } : d));
+    if (deal) {
+      fireTrigger('deal_stage_changed', { name: deal.title, stage });
+      if (stage === 'Won') fireTrigger('deal_won', { name: deal.title, value: String(deal.value) });
+      if (stage === 'Lost') fireTrigger('deal_lost', { name: deal.title });
+    }
     setDragId(null); setDragOver(null);
   };
 

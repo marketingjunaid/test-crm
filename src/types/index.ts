@@ -1,7 +1,8 @@
 export type AppSection =
   | 'dashboard' | 'crm' | 'hr' | 'finance' | 'projects'
   | 'inventory' | 'support' | 'assets' | 'announcements'
-  | 'documents' | 'settings' | 'chat' | 'calendar' | 'selfservice';
+  | 'documents' | 'settings' | 'chat' | 'calendar' | 'selfservice'
+  | 'analytics' | 'communication' | 'automation';
 
 export interface CalendarEvent {
   id: string;
@@ -26,6 +27,10 @@ export interface AppUser {
   status: 'Active' | 'Inactive';
   createdAt: string;
   sectionOverrides?: AppSection[];
+  managerId?: string;
+  linkedEmployeeId?: string;
+  mustChangePassword?: boolean;
+  hasLoggedIn?: boolean;
 }
 
 export interface CompanySettings {
@@ -107,6 +112,12 @@ export interface Employee {
   status: 'Active' | 'Inactive';
   contractType: 'Full-time' | 'Part-time' | 'Contract';
   managerId?: string;
+  linkedUserId?: string;
+  address?: string;
+  emergencyContact?: string;
+  emergencyPhone?: string;
+  dateOfBirth?: string;
+  nationality?: string;
   createdAt: string;
 }
 
@@ -402,6 +413,84 @@ export interface AppNotification {
   read: boolean;
   createdAt: string;
   link?: string;
+}
+
+export interface PollOption {
+  id: string;
+  text: string;
+  votes: string[];
+}
+
+export type AutomationTrigger =
+  | 'employee_added'
+  | 'leave_approved'
+  | 'leave_rejected'
+  | 'deal_won'
+  | 'deal_lost'
+  | 'deal_stage_changed'
+  | 'ticket_created'
+  | 'ticket_resolved'
+  | 'candidate_hired'
+  | 'invoice_overdue'
+  | 'task_overdue';
+
+export type AutomationAction =
+  | 'send_notification'
+  | 'create_task'
+  | 'create_announcement'
+  | 'escalate_ticket'
+  | 'send_notification_to_manager';
+
+export interface AutomationRule {
+  id: string;
+  name: string;
+  trigger: AutomationTrigger;
+  action: AutomationAction;
+  actionPayload: Record<string, string>;
+  conditions: { field: string; operator: 'equals' | 'not_equals'; value: string }[];
+  enabled: boolean;
+  runCount: number;
+  lastRun?: string;
+  createdAt: string;
+  isBuiltIn: boolean;
+}
+
+export interface AutomationLog {
+  id: string;
+  ruleId: string;
+  ruleName: string;
+  trigger: string;
+  action: string;
+  detail: string;
+  ranAt: string;
+  success: boolean;
+}
+
+export interface Poll {
+  id: string;
+  question: string;
+  options: PollOption[];
+  createdBy: string;
+  createdAt: string;
+  endsAt?: string;
+  status: 'Active' | 'Closed';
+  allowMultiple: boolean;
+  department: string;
+}
+
+export interface Meeting {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  duration: number;
+  attendees: string[];
+  videoLink?: string;
+  platform: 'Google Meet' | 'Zoom' | 'Teams' | 'Other';
+  createdBy: string;
+  createdAt: string;
+  status: 'Scheduled' | 'Completed' | 'Cancelled';
 }
 
 export interface AuditLog {

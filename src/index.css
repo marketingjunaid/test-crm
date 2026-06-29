@@ -3,6 +3,76 @@
 @tailwind utilities;
 * { box-sizing: border-box; }
 body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #F8FAFC; }
+
+/* ── Dark mode global overrides ──────────────────────── */
+.dark body { background: #0f172a; }
+.dark main  { background: #0f172a; }
+
+/* Cards / panels */
+.dark .bg-white { background-color: #1e293b !important; }
+.dark .bg-slate-50 { background-color: #0f172a !important; }
+
+/* Borders */
+.dark .border-slate-100 { border-color: #334155 !important; }
+.dark .border-slate-200 { border-color: #334155 !important; }
+
+/* Text */
+.dark .text-slate-900 { color: #f1f5f9 !important; }
+.dark .text-slate-800 { color: #e2e8f0 !important; }
+.dark .text-slate-700 { color: #cbd5e1 !important; }
+.dark .text-slate-600 { color: #94a3b8 !important; }
+.dark .text-slate-500 { color: #64748b !important; }
+
+/* Inputs / selects */
+.dark input:not([type=checkbox]):not([type=radio]),
+.dark select,
+.dark textarea {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+.dark input::placeholder,
+.dark textarea::placeholder { color: #475569 !important; }
+
+/* Table rows hover */
+.dark .hover\:bg-slate-50\/50:hover { background-color: rgba(30,41,59,0.5) !important; }
+.dark .hover\:bg-slate-50:hover { background-color: #1e293b !important; }
+.dark .bg-slate-50\/50 { background-color: rgba(15,23,42,0.5) !important; }
+
+/* Stat / info cards with coloured backgrounds — keep them, just darken slightly */
+.dark .bg-indigo-50 { background-color: #1e1b4b !important; }
+.dark .bg-emerald-50 { background-color: #052e16 !important; }
+.dark .bg-blue-50 { background-color: #0c1a2e !important; }
+.dark .bg-violet-50 { background-color: #1e1033 !important; }
+.dark .bg-rose-50 { background-color: #2d0a14 !important; }
+.dark .bg-amber-50 { background-color: #2d1f00 !important; }
+.dark .bg-orange-50 { background-color: #2d1500 !important; }
+.dark .bg-red-50 { background-color: #2d0a0a !important; }
+.dark .bg-green-50 { background-color: #052e16 !important; }
+.dark .bg-purple-50 { background-color: #1e1033 !important; }
+.dark .bg-sky-50 { background-color: #0c1a2e !important; }
+.dark .bg-teal-50 { background-color: #042f2e !important; }
+.dark .bg-cyan-50 { background-color: #0a2234 !important; }
+.dark .bg-yellow-50 { background-color: #2d2200 !important; }
+.dark .bg-pink-50 { background-color: #2d0a1f !important; }
+
+/* Adjust coloured text in dark coloured boxes */
+.dark .bg-indigo-50 .text-indigo-700,
+.dark .bg-indigo-50 .text-indigo-600 { color: #a5b4fc !important; }
+.dark .bg-emerald-50 .text-emerald-700,
+.dark .bg-emerald-50 .text-emerald-600 { color: #6ee7b7 !important; }
+.dark .bg-blue-50 .text-blue-700,
+.dark .bg-blue-50 .text-blue-600 { color: #93c5fd !important; }
+.dark .bg-violet-50 .text-violet-700,
+.dark .bg-violet-50 .text-violet-600 { color: #c4b5fd !important; }
+.dark .bg-rose-50 .text-rose-700,
+.dark .bg-rose-50 .text-rose-600 { color: #fda4af !important; }
+
+/* Modal overlay backdrop stays dark */
+.dark .bg-black\/50 { background-color: rgba(0,0,0,0.7) !important; }
+
+/* Dropdown menus */
+.dark .shadow-lg { --tw-shadow: 0 10px 15px -3px rgba(0,0,0,0.5), 0 4px 6px -4px rgba(0,0,0,0.5); box-shadow: var(--tw-shadow) !important; }
 .sidebar-scroll::-webkit-scrollbar { width: 3px; }
 .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
 .sidebar-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }

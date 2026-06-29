@@ -167,7 +167,7 @@ const EmojiPicker: React.FC<{ onPick: (e: string) => void; onClose: () => void }
     return () => document.removeEventListener('mousedown', handler);
   }, [onClose]);
   return (
-    <div ref={ref} className="absolute bottom-full right-0 mb-1 bg-white border border-slate-200 rounded-xl shadow-lg p-2 flex gap-1 z-50 animate-fadeIn">
+    <div ref={ref} className="absolute bottom-full right-0 mb-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl shadow-lg p-2 flex gap-1 z-50 animate-fadeIn">
       {COMMON_EMOJI.map(e => (
         <button key={e} onClick={() => { onPick(e); onClose(); }} className="text-lg hover:bg-slate-100 rounded-lg p-1 transition-colors">{e}</button>
       ))}
@@ -189,7 +189,7 @@ const MessageActions: React.FC<{
 }> = ({ msg, isMine, isAdmin, onReact, onReply, onEdit, onDelete, onPin }) => {
   const [showEmoji, setShowEmoji] = useState(false);
   return (
-    <div className="absolute -top-8 right-0 opacity-0 group-hover:opacity-100 transition-opacity duration-100 flex items-center gap-0.5 bg-white border border-slate-200 rounded-lg shadow-md px-1 py-0.5 z-10">
+    <div className="absolute -top-8 right-0 opacity-0 group-hover:opacity-100 transition-opacity duration-100 flex items-center gap-0.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg shadow-md px-1 py-0.5 z-10">
       <div className="relative">
         <button onClick={() => setShowEmoji(v => !v)} className="p-1.5 hover:bg-slate-100 rounded text-slate-400 hover:text-slate-700 transition-colors" title="React">
           <Smile size={14} />
@@ -275,7 +275,7 @@ const MessageBubble: React.FC<{
   onDelete: (id: string) => void;
   onPin: (msg: ChatMessage) => void;
 }> = ({ msg, grouped, isMine, isAdmin, threadCount, onReact, onReply, onEdit, onDelete, onPin }) => (
-  <div className={`group relative flex gap-2 px-4 py-0.5 hover:bg-slate-50 transition-colors ${msg.pending ? 'opacity-60' : ''} animate-messageIn`}>
+  <div className={`group relative flex gap-2 px-4 py-0.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${msg.pending ? 'opacity-60' : ''} animate-messageIn`}>
     <div className="w-8 flex-shrink-0 mt-0.5">
       {!grouped && <Avatar name={msg.senderName} id={msg.senderId} />}
     </div>
@@ -484,7 +484,7 @@ const Composer: React.FC<{
           ))}
         </div>
       )}
-      <div className="flex items-end gap-2 bg-white border border-slate-200 rounded-xl px-3 py-2 focus-within:border-indigo-400 focus-within:ring-1 focus-within:ring-indigo-200 transition-all shadow-sm">
+      <div className="flex items-end gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2 focus-within:border-indigo-400 focus-within:ring-1 focus-within:ring-indigo-200 transition-all shadow-sm">
         <textarea
           ref={textRef}
           value={text}
@@ -576,7 +576,7 @@ const ThreadPanel: React.FC<{
   };
 
   return (
-    <div className="flex flex-col h-full border-l border-slate-200 bg-white animate-slideIn" style={{ width: 360 }}>
+    <div className="flex flex-col h-full border-l border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 animate-slideIn" style={{ width: 360 }}>
       <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200">
         <div className="flex items-center gap-2">
           <MessageSquare size={16} className="text-slate-500" />
@@ -924,7 +924,7 @@ export default function Chat({ standalone = false }: { standalone?: boolean }) {
   if (!currentUser) return null;
 
   return (
-    <div className="flex flex-col h-screen bg-slate-100 overflow-hidden">
+    <div className="flex flex-col h-screen bg-slate-100 dark:bg-slate-950 overflow-hidden">
       {/* ── App top bar ──────────────────────────────────────────── */}
       <div className="flex items-center gap-3 px-4 h-12 bg-slate-900 flex-shrink-0">
         <div className="w-6 h-6 bg-indigo-600 rounded-md flex items-center justify-center flex-shrink-0">
@@ -1022,7 +1022,7 @@ export default function Chat({ standalone = false }: { standalone?: boolean }) {
         {/* Message area */}
         <div className="flex flex-col flex-1 min-w-0">
           {/* Channel header */}
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-200 bg-white">
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
             {activeChannel?.type === 'dm' ? (
               <div className="flex items-center gap-2">
                 <div className={`w-7 h-7 ${avatarColor(dmOtherUser(activeChannel)?.id || '')} rounded-full flex items-center justify-center text-white text-xs font-bold`}>
@@ -1085,7 +1085,7 @@ export default function Chat({ standalone = false }: { standalone?: boolean }) {
           <div
             ref={scrollRef}
             onScroll={handleScroll}
-            className="flex-1 overflow-y-auto py-4"
+            className="flex-1 overflow-y-auto py-4 dark:bg-slate-950"
             role="log"
             aria-live="polite"
             aria-label={`Messages in ${activeChannel?.name || 'general'}`}
@@ -1100,9 +1100,9 @@ export default function Chat({ standalone = false }: { standalone?: boolean }) {
             {grouped.map(({ date, msgs: dayMsgs }) => (
               <div key={date}>
                 <div className="flex items-center gap-3 px-4 my-3">
-                  <div className="flex-1 h-px bg-slate-100" />
-                  <span className="text-[10px] font-medium text-slate-400 bg-white px-2">{date}</span>
-                  <div className="flex-1 h-px bg-slate-100" />
+                  <div className="flex-1 h-px bg-slate-100 dark:bg-slate-700" />
+                  <span className="text-[10px] font-medium text-slate-400 bg-white dark:bg-slate-950 px-2">{date}</span>
+                  <div className="flex-1 h-px bg-slate-100 dark:bg-slate-700" />
                 </div>
                 {dayMsgs.map((msg, i) => (
                   <MessageBubble

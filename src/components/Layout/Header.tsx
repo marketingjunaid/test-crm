@@ -26,7 +26,7 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="h-14 bg-white border-b border-slate-100 flex items-center justify-between px-6 gap-3 sticky top-0 z-20">
+    <header className="h-14 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between px-6 gap-3 sticky top-0 z-20">
       <ThemeToggle />
       {/* Notifications */}
       <div className="relative">
@@ -36,7 +36,7 @@ export const Header: React.FC = () => {
           {unread > 0 && <span className="absolute top-1 right-1 w-4 h-4 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{unread}</span>}
         </button>
         {showNotifs && (
-          <div className="absolute right-0 top-11 w-80 bg-white rounded-xl shadow-lg border border-slate-100 z-50">
+          <div className="absolute right-0 top-11 w-80 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-100 dark:border-slate-700 z-50">
             <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
               <span className="text-sm font-semibold text-slate-900">Notifications</span>
               <button onClick={markAllRead} className="text-xs text-indigo-600 hover:text-indigo-700">Mark all read</button>
@@ -67,7 +67,7 @@ export const Header: React.FC = () => {
           <span className="text-sm font-medium text-slate-700 hidden sm:block">{currentUser?.name}</span>
         </button>
         {showUser && (
-          <div className="absolute right-0 top-11 w-44 bg-white rounded-xl shadow-lg border border-slate-100 z-50 py-1">
+          <div className="absolute right-0 top-11 w-44 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-100 dark:border-slate-700 z-50 py-1">
             <div className="px-3 py-2 border-b border-slate-100">
               <p className="text-xs font-medium text-slate-900">{currentUser?.name}</p>
               <p className="text-[11px] text-slate-500">{currentUser?.role}</p>

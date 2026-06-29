@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { useAuth } from './contexts/AuthContext';
@@ -40,11 +41,64 @@ import Assets from './pages/Assets';
 import Announcements from './pages/Announcements';
 import Documents from './pages/Documents';
 import Settings from './pages/settings/Settings';
+import Analytics from './pages/Analytics';
+import Polls from './pages/communication/Polls';
+import Meetings from './pages/communication/Meetings';
+import AutomationPage from './pages/automation/Automation';
+
+function ChangePasswordOverlay() {
+  const { changePassword } = useAuth();
+  const [pw, setPw] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [err, setErr] = useState('');
+
+  const submit = () => {
+    if (pw.length < 6) { setErr('Password must be at least 6 characters.'); return; }
+    if (pw !== confirm) { setErr('Passwords do not match.'); return; }
+    changePassword(pw);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-8">
+        <div className="text-center mb-6">
+          <div className="w-14 h-14 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <svg className="w-7 h-7 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          </div>
+          <h2 className="text-lg font-bold text-slate-800">Set Your Password</h2>
+          <p className="text-sm text-slate-500 mt-1">Your account was set up with a temporary password. Please create a new password to continue.</p>
+        </div>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-xs font-medium text-slate-700 mb-1">New Password</label>
+            <input type="password" value={pw} onChange={e => setPw(e.target.value)} placeholder="Min. 6 characters"
+              className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-200"/>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-700 mb-1">Confirm Password</label>
+            <input type="password" value={confirm} onChange={e => setConfirm(e.target.value)} placeholder="Re-enter password"
+              className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-200"/>
+          </div>
+          {err && <p className="text-xs text-rose-600">{err}</p>}
+          <button onClick={submit}
+            className="w-full bg-indigo-600 text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors">
+            Set Password & Continue
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function RequireAuth() {
-  const { currentUser } = useAuth();
+  const { currentUser, mustChangePassword } = useAuth();
   if (!currentUser) return <Navigate to="/login" replace />;
-  return <Layout />;
+  return (
+    <>
+      {mustChangePassword && <ChangePasswordOverlay />}
+      <Layout />
+    </>
+  );
 }
 
 function StandaloneChatGuard() {
@@ -137,6 +191,19 @@ function AppRoutes() {
 
         <Route element={<ProtectedSection section="documents" />}>
           <Route path="/documents" element={<Documents />} />
+        </Route>
+
+        <Route element={<ProtectedSection section="analytics" />}>
+          <Route path="/analytics" element={<Analytics />} />
+        </Route>
+
+        <Route element={<ProtectedSection section="communication" />}>
+          <Route path="/communication/polls" element={<Polls />} />
+          <Route path="/communication/meetings" element={<Meetings />} />
+        </Route>
+
+        <Route element={<ProtectedSection section="automation" />}>
+          <Route path="/automation" element={<AutomationPage />} />
         </Route>
 
         <Route element={<ProtectedSection section="settings" />}>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { getJobs, saveJobs, getCandidates, saveCandidates } from '../../store/storage';
+import { fireTrigger } from '../../utils/automationEngine';
 import { HiringJob, HiringCandidate } from '../../types';
 import PageHeader from '../../components/UI/PageHeader';
 import Button from '../../components/UI/Button';
@@ -53,6 +54,7 @@ export default function Hiring() {
 
   const saveCand = () => {
     let updated: HiringCandidate[];
+    const prevStage = editCand?.stage;
     if (editCand) {
       updated = candidates.map(c => c.id === editCand.id ? { ...c, ...candForm } : c);
     } else {
@@ -60,6 +62,9 @@ export default function Hiring() {
       updated = [...candidates, newCand];
     }
     saveCandidates(updated); setCandidates(updated); setShowCandModal(false);
+    if (candForm.stage === 'Hired' && prevStage !== 'Hired') {
+      fireTrigger('candidate_hired', { name: candForm.name || editCand?.name || '' });
+    }
   };
 
   const deleteCand = (id: string) => { const u = candidates.filter(c => c.id !== id); saveCandidates(u); setCandidates(u); };

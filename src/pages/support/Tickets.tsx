@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { getTickets, saveTickets } from '../../store/storage';
+import { fireTrigger } from '../../utils/automationEngine';
 import { Ticket } from '../../types';
 import PageHeader from '../../components/UI/PageHeader';
 import Button from '../../components/UI/Button';
@@ -32,6 +33,7 @@ export default function Tickets() {
     } else {
       const newT: Ticket = { id: crypto.randomUUID(), ticketNumber: `TKT-${String(tickets.length + 1).padStart(4, '0')}`, ...form, createdAt: new Date().toISOString().split('T')[0] };
       updated = [...tickets, newT];
+      fireTrigger('ticket_created', { name: form.subject, ticketId: newT.id });
     }
     saveTickets(updated); setTickets(updated); setShowModal(false);
   };

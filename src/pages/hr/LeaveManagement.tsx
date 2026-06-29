@@ -9,6 +9,7 @@ import { Select } from '../../components/UI/Select';
 import { Textarea } from '../../components/UI/Textarea';
 import { EmptyState } from '../../components/UI/EmptyState';
 import { getLeaves, saveLeaves, getEmployees, getCompany } from '../../store/storage';
+import { fireTrigger } from '../../utils/automationEngine';
 import { useAuth } from '../../contexts/AuthContext';
 import type { LeaveApplication } from '../../types';
 
@@ -79,10 +80,13 @@ export default function LeaveManagement() {
   // Manager approves → moves to Pending HR; Manager rejects → Rejected
   // HR approves → Approved; HR rejects → Rejected
   const handleApprove = (l: LeaveApplication) => {
-    if (isManager) updateStatus(l.id, 'Pending HR');
-    else updateStatus(l.id, 'Approved');
+    if (isManager) { updateStatus(l.id, 'Pending HR'); }
+    else { updateStatus(l.id, 'Approved'); fireTrigger('leave_approved', { name: l.employeeName }); }
   };
-  const handleReject = (l: LeaveApplication) => updateStatus(l.id, 'Rejected');
+  const handleReject = (l: LeaveApplication) => {
+    updateStatus(l.id, 'Rejected');
+    fireTrigger('leave_rejected', { name: l.employeeName });
+  };
 
   const canAct = (l: LeaveApplication) => {
     if (isManager) return l.status === 'Pending Manager';
